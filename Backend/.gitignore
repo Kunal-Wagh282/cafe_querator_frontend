@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+bin/
+lib/
+lib64/
+include/
+scripts/
+pyvenv.cfg
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# If your Django settings file contains sensitive information, you might want to ignore it.
+# *Never commit passwords or other sensitive information to version control.*
+# settings.py
+
+# If you have environment variables in a .env file
+.env
+
+# Django migrations
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Static and media files
