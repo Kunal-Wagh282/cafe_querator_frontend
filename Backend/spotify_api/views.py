@@ -15,9 +15,7 @@ from .serializers import *
 @method_decorator(csrf_protect, name='dispatch')
 class SpotifyAuth(APIView):
     serializer_class = SpotifyAuthSerializer
-    permission_classes = (permissions.AllowAny,)
     def post(self,request, format = None):
-
         data = request.data
         user = self.request.user
         username = user.username
