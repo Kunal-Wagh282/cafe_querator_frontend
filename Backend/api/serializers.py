@@ -21,4 +21,4 @@ class UserSerializer(serializers.ModelSerializer):
 class CafeInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cafe_Info
-        fields = ['Cafe_Name', 'Cafe_Address', 'Cafe_Contact', 'Owner_Name', 'Owner_Contact']
+        fields = ['Cafe_Name', 'Cafe_Address', 'Cafe_Contact', 'Owner_Name', 'Owner_Contact', 'No_of_Tables']

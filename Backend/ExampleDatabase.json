@@ -1,0 +1,13 @@
+{
+    "id": 1,
+    "username": "example@goje.com",
+    "password": "dvshcbfadhkvbshkda(hash value)",
+    "info": {
+        "Cafe_Name":"Example",
+        "Cafe_Address":"Example",
+        "Cafe_Contact":"1234567890",
+        "Owener_Name":"Example",
+        "Owener_Contact":"1234567890" ,
+        "No_of_Tables":0
+    }
+}
