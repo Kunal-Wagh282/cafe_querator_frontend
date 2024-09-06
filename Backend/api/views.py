@@ -2,6 +2,7 @@ from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import *
+
 from .models import User
 import jwt, datetime
 
@@ -13,7 +14,19 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-            
+    # def post(self, request, format = None):
+    #     data = self.request.data
+    #     username = data['username']
+    #     password = data['password']
+    #     try:
+    #         if User.objects.filter(username=username).exists():
+    #             return Response({'error': 'User already exists'}, status =status.HTTP_226_IM_USED)
+    #         else:
+    #             User.objects.create_user(username=username, password=password)
+    #             return Response({ 'success': 'User created successfully' }, status =status.HTTP_201_CREATED)
+    #     except:
+    #         return Response({ 'error': 'Something went wrong when registering account' },status=status.HTTP_400_BAD_REQUEST)
+          
 class LoginView(APIView):
     def post(self, request):
         email = request.data['email']
@@ -80,13 +93,12 @@ class CafeInfoView(APIView):
             Cafe_Contact = serializer.validated_data['Cafe_Contact']
             Owner_Name = serializer.validated_data['Owner_Name']
             Owner_Contact = serializer.validated_data['Owner_Contact']
-            No_of_Tables = serializer.validated_data['No_of_Tables']
 
             try:
                 user = User.objects.get(id=user.id)
-                cafe_info = Cafe_Info(user=user, Cafe_Address = Cafe_Address, Cafe_Name = Cafe_Name, Cafe_Contact = Cafe_Contact, Owner_Name = Owner_Name, Owner_Contact = Owner_Contact, No_of_Tables=No_of_Tables)
+                cafe_info = Cafe_Info(user=user, Cafe_Address = Cafe_Address, Cafe_Name = Cafe_Name, Cafe_Contact = Cafe_Contact, Owner_Name = Owner_Name, Owner_Contact = Owner_Contact)
                 cafe_info.save()
                 return Response({"success":"User Info saved"},status=status.HTTP_200_OK)
             except Exception as e:
-                return Response({"error":f"{e}"},status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error":""},status=status.HTTP_400_BAD_REQUEST)
         return Response({"error":"Bad body parameters"},status=status.HTTP_424_FAILED_DEPENDENCY)
