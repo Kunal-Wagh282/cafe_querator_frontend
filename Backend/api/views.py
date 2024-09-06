@@ -2,7 +2,6 @@ from rest_framework.views import APIView, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import *
-
 from .models import User
 import jwt, datetime
 
@@ -14,19 +13,7 @@ class SignupView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    # def post(self, request, format = None):
-    #     data = self.request.data
-    #     username = data['username']
-    #     password = data['password']
-    #     try:
-    #         if User.objects.filter(username=username).exists():
-    #             return Response({'error': 'User already exists'}, status =status.HTTP_226_IM_USED)
-    #         else:
-    #             User.objects.create_user(username=username, password=password)
-    #             return Response({ 'success': 'User created successfully' }, status =status.HTTP_201_CREATED)
-    #     except:
-    #         return Response({ 'error': 'Something went wrong when registering account' },status=status.HTTP_400_BAD_REQUEST)
-          
+    
 class LoginView(APIView):
     def post(self, request):
         email = request.data['email']
