@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import axios from 'axios'; // Ensure axios is imported
+import RegistrationForm from './RegistrationForm';
+import './App.css';
+import API_URL from './config'; // Import the API URL
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Optional: Define setError if it's used for setting state or logging errors
+  const setError = (message) => {
+    console.error(message);
+    // Implement error handling logic if needed
+  };
+
+  useEffect(() => {
+    // Function to call the API
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/csrf_cookie`, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.status === 200) {
+          console.log('CSRF cookie fetched successfully',response);
+          // Handle your success logic here
+        }
+      } catch (error) {
+        console.error("Catch error=",error);
+      }
+    };
+
+    // Call the function
+    fetchData();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" exact element={<RegistrationForm />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
