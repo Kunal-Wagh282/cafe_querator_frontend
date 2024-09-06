@@ -4,6 +4,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from .serializers import *
 from .models import User
 import jwt, datetime
+from datetime import datetime, timedelta, timezone
+
 
 
 
@@ -27,10 +29,9 @@ class LoginView(APIView):
             return Response({"error":"Incorrect Password"},status=status.HTTP_400_BAD_REQUEST)
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.utcnow()
+            'exp': datetime.now(timezone.utc) + timedelta(minutes=60),
+            'iat': datetime.now(timezone.utc)
         }
-
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
