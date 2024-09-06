@@ -31,9 +31,8 @@ class Vibe_Check_Parameters(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     playlist_vector = models.IntegerField()
 
-class Song_Queue(models.Model):
+class Track_Queue(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    vibe_check_parameters= models.OneToOneField(Vibe_Check_Parameters, on_delete=models.CASCADE)
     Table_Number = models.IntegerField(default=-1)
-    song_name = models.CharField(max_length=255)
-    song_Id = models.CharField(max_length=255)
+    Track_Name = models.CharField(max_length=255)
+    Track_Id = models.CharField(max_length=255)

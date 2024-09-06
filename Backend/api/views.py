@@ -27,8 +27,8 @@ class LoginView(APIView):
             return Response({"error":"Incorrect Password"},status=status.HTTP_400_BAD_REQUEST)
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.now() + datetime.timedelta(minutes=60),
-            'iat': datetime.datetime.now()
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.utcnow()
         }
 
         token = jwt.encode(payload, 'secret', algorithm='HS256')
@@ -80,7 +80,7 @@ class CafeInfoView(APIView):
             Cafe_Contact = serializer.validated_data['Cafe_Contact']
             Owner_Name = serializer.validated_data['Owner_Name']
             Owner_Contact = serializer.validated_data['Owner_Contact']
-            No_of_Tables = serializer.validated_data['No_Of_Tables']
+            No_of_Tables = serializer.validated_data['No_of_Tables']
 
             try:
                 user = User.objects.get(id=user.id)

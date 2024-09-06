@@ -2,12 +2,45 @@
     "id": 1,
     "username": "example@goje.com",
     "password": "dvshcbfadhkvbshkda(hash value)",
-    "info": {
+    "Cafe_Info": {
         "Cafe_Name":"Example",
         "Cafe_Address":"Example",
         "Cafe_Contact":"1234567890",
         "Owener_Name":"Example",
         "Owener_Contact":"1234567890" ,
         "No_of_Tables":0
+    },
+    "Spotify_Api_Parameters":{
+        "access_token":"Token",
+        "refresh_token":"Token",
+        "expires_at":"Timestamp"
+    },
+    "Vibe_Check_Parameters":{
+        "Playlist_Vector":
+            {
+                "acousticness": 0.00242,
+                "analysis_url": "https://api.spotify.com/v1/audio-analysis/2takcwOaAZWiXQijPHIx7B",
+                "danceability": 0.585,
+                "duration_ms": 237040,
+                "energy": 0.842,
+                "id": "2takcwOaAZWiXQijPHIx7B",
+                "instrumentalness": 0.00686,
+                "key": 9,
+                "liveness": 0.0866,
+                "loudness": -5.883,
+                "mode": 0,
+                "speechiness": 0.0556,
+                "tempo": 118.211,
+                "time_signature": 4,
+                "track_href": "https://api.spotify.com/v1/tracks/2takcwOaAZWiXQijPHIx7B",
+                "type": "audio_features",
+                "uri": "spotify:track:2takcwOaAZWiXQijPHIx7B",
+                "valence": 0.428
+              }   
+    },
+    "Track_Queue": {
+        "Table_Number": "1",
+        "Track_Name": "Song",
+        "Track_Id": "1"
     }
 }
