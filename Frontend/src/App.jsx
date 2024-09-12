@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './LoginPage';
-import RegistrationPage from './RegistrationPage';
-import SpotifyLoginPage from './SpotifyLoginPage';
+import LoginPage from './pages/LoginPage';
+import RegistrationPage from './pages/RegistrationPage';
+import SpotifyLoginPage from './pages/SpotifyLoginPage';
 import './App.css';
 
 function App() {
