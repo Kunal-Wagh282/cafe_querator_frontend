@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RegistrationPage.css'; // Import the CSS file for styling
-import registrationImage from './RegistrationPage.png'; // Import your registration image
+import registrationImage from './images/RegistrationPage.png'; // Import your registration image
 
 const RegistrationPage = () => {
   const [step, setStep] = useState(1); // Track which part of the form is displayed

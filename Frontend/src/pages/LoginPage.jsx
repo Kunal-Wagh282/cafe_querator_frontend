@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './LoginPage.css'; // Import the CSS file for styling
-import cafeImage from './LoginPage.png'; // Import your image
+import cafeImage from './images/LoginPage.png'; // Import your image
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
