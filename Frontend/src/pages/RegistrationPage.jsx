@@ -1,16 +1,18 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/RegistrationPage.css'; // Import the CSS file for styling
-import registrationImage from '../images/RegistrationPage.png'; // Import your registration image
+import '../styles/RegistrationPage.css'; 
+import registrationImage from '../images/RegistrationPage.png'; 
 
 const RegistrationPage = () => {
-  const [step, setStep] = useState(1); // Track which part of the form is displayed
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    cafeName: '',
+    CafeName: '',
     cafeAddress: '',
     cafeContact: '',
     ownerName: '',
     ownerContact: '',
+    no_of_Tables: '',
     username: '',
     password: '',
     confirmPassword: '',
@@ -25,25 +27,21 @@ const RegistrationPage = () => {
 
   const handleNext = (e) => {
     e.preventDefault();
+    const { CafeName, cafeAddress, cafeContact, ownerName, ownerContact, no_of_Tables } = formData;
 
-    // Check if all fields in the current step are filled out
-    const { cafeName, cafeAddress, cafeContact, ownerName, ownerContact } = formData;
-
-    if (!cafeName || !cafeAddress || !cafeContact || !ownerName || !ownerContact) {
+    if (!CafeName || !cafeAddress || !cafeContact || !ownerName || !ownerContact || !no_of_Tables) {
       alert('Please fill out all fields before proceeding.');
       return;
     }
 
-    // Move to the next step
-    setStep(2);
+    setStep(2); // Move to Step 2 after all fields are filled
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    const { username, password, confirmPassword, CafeName, cafeAddress, cafeContact, ownerName, ownerContact, no_of_Tables } = formData;
 
-    // Check if all fields in the registration step are filled out
-    const { username, password, confirmPassword } = formData;
-
+    // Check for missing fields or mismatched passwords
     if (!username || !password || !confirmPassword) {
       alert('Please fill out all fields before registering.');
       return;
@@ -54,15 +52,38 @@ const RegistrationPage = () => {
       return;
     }
 
-    // Handle registration logic here
-    console.log('Registration successful', formData);
-    navigate('/spotify-login'); // Navigate to the login page after registration
+    try {
+      // Send the user and cafe details to the backend
+      const response = await axios.post('https://cafequerator-backend.onrender.com/api/register', {
+        email: username,  // Change 'username' to 'email'
+        password,
+        cafe_info: {
+          Cafe_Name: CafeName,            // Change 'CafeName' to 'Cafe_Name'
+          Cafe_Address: cafeAddress,      // Change 'cafeAddress' to 'Cafe_Address'
+          Cafe_Contact: cafeContact,      // Change 'cafeContact' to 'Cafe_Contact'
+          Owner_Name: ownerName,          // Change 'ownerName' to 'Owner_Name'
+          Owner_Contact: ownerContact,    // Change 'ownerContact' to 'Owner_Contact'
+          No_of_Tables: no_of_Tables      // Change 'no_of_Tables' to 'No_of_Tables'
+        },
+      });
+
+      // If the API response is successful, navigate to the Spotify login page
+      if (response.status === 201 || response.status === 200) {
+        console.log('Registration successful:', response.data);
+        navigate('/spotify-login');  // Redirect to the Spotify login page
+      }
+
+    } catch (error) {
+      // Handle registration failure
+      console.error('There was an error with registration:', error);
+      alert('Registration failed. Please try again.');
+    }
   };
 
   return (
     <div className="registration-content">
       <div className="registration-image">
-        <img src={registrationImage} alt="Cafe Illustration" /> {/* Use the imported image */}
+        <img src={registrationImage} alt="Cafe Illustration" />
       </div>
       <div className="registration-form-container">
         {step === 1 ? (
@@ -72,8 +93,8 @@ const RegistrationPage = () => {
               <input
                 type="text"
                 placeholder="Cafe Name"
-                name="cafeName"
-                value={formData.cafeName}
+                name="CafeName"
+                value={formData.CafeName}
                 onChange={handleChange}
                 required
               />
@@ -106,6 +127,14 @@ const RegistrationPage = () => {
                 placeholder="Owner Contact"
                 name="ownerContact"
                 value={formData.ownerContact}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Number of Tables"
+                name="no_of_Tables"
+                value={formData.no_of_Tables}
                 onChange={handleChange}
                 required
               />
