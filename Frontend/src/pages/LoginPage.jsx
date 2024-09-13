@@ -1,26 +1,44 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../styles/LoginPage.css'; // Import the CSS file for styling
-import cafeImage from '../images/LoginPage.png'; // Import your image
+import axios from 'axios'; // Import axios for API requests
+import '../styles/LoginPage.css';
+import cafeImage from '../images/LoginPage.png';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (username === 'user' && password === 'password') {
-      console.log('Login successful');
-      navigate('/Dashboard'); // Navigate to the dashboard after login
-    } else {
-      alert('Invalid username or password');
+
+    try {
+      const response = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
+        email: username,
+        password: password
+      });
+
+      if (response.data && response.data.message === 'token set') {
+        console.log('Login successful');
+        
+        // Store the received data for use in the dashboard
+        const cafeData = response.data.data;
+        localStorage.setItem('cafeData', JSON.stringify(cafeData)); // Store cafe data in localStorage
+
+        // Navigate to dashboard
+        navigate('/Dashboard');
+      } else {
+        alert('Invalid username or password');
+      }
+    } catch (error) {
+      console.error('Error logging in:', error);
+      alert('Login failed. Please try again.');
     }
   };
 
   return (
     <div className="login-page">
-        <h1>Welcome to cafe-Qurator</h1>
+      <h1>Welcome to cafe-Qurator</h1>
       <div className="login-content">
         <div className="login-image">
           <img src={cafeImage} alt="Cafe Illustration" />

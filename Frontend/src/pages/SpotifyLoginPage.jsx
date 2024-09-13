@@ -6,7 +6,7 @@ const SpotifyLoginPage = () => {
   const REDIRECT_URI = "http://localhost:5173/";
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
-  const BACKEND_API = "http://localhost:8000/api/save-token"; // Change this to your backend endpoint
+  const BACKEND_API = "https://cafequerator-backend.onrender.com/api/settoken"; // Updated to your backend API
   const [token, setToken] = useState("");
   const [searchKey, setSearchKey] = useState("");
   const [artists, setArtists] = useState([]);
@@ -16,25 +16,32 @@ const SpotifyLoginPage = () => {
     let token = window.localStorage.getItem("token");
 
     if (!token && hash) {
-      // Extract the access token from the URL hash
-      token = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1];
+      // Extract the access token and refresh token from the URL hash
+      const accessToken = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1];
+      const refreshToken = "your_refresh_token"; // Replace with logic to fetch refresh token
+      const expiresAt = new Date(new Date().getTime() + 3600 * 1000); // Set expiration time (1 hour for token expiration)
+      
       window.location.hash = "";
-      window.localStorage.setItem("token", token);
+      window.localStorage.setItem("token", accessToken);
 
-      // Send the access token to your backend
-      sendTokenToBackend(token);
+      // Send the tokens to your backend
+      sendTokenToBackend(accessToken, refreshToken, expiresAt.toISOString());
     }
 
     setToken(token);
   }, []);
 
-  const sendTokenToBackend = async (token) => {
+  const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      const response = await axios.post(BACKEND_API, { token });
-      console.log('Token successfully sent to backend:', response.data);
+      const response = await axios.post(BACKEND_API, { 
+        access_token: accessToken, 
+        refresh_token: refreshToken, 
+        expires_at: expiresAt 
+      });
+      console.log('Tokens successfully sent to backend:', response.data);
     } catch (error) {
-      console.error('Error sending token to backend:', error);
-      alert('Failed to send token to the server.');
+      console.error('Error sending tokens to backend:', error);
+      alert('Failed to send tokens to the server.');
     }
   };
 
