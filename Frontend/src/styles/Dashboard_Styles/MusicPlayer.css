@@ -1,0 +1,22 @@
+.music-player {
+    background-color: #e8e8d8;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .controls button {
+    margin: 0 5px;
+  }
+  
+  .time-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  input[type="range"] {
+    margin: 0 10px;
+    width: 200px;
+  }
+  
