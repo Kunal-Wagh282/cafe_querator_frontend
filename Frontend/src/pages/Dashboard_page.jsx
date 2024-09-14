@@ -21,15 +21,15 @@ const Dashboard = () => {
             <h2>Table</h2>
             {/* Add tables for status here */}
           </div>
+        </div>
 
-          <div className="queue-section">
+        <div className="queue-section">
             <h2>Queue</h2>
             {/* Blank container for Spotify Queue */}
             <div className="spotify-queue">
               <p>Spotify queue will display here</p>
             </div>
           </div>
-        </div>
 
         <div className="music-player">
           {/* Blank container for Spotify Music Player */}
