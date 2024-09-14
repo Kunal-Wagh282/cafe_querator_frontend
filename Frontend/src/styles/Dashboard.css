@@ -1,25 +1,81 @@
+/* General container for the whole dashboard */
 .dashboard-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #f8f8f8;
   }
   
-  .main-content {
-    flex-grow: 1;
+  /* Header styling */
+  .dashboard-header {
+    width: 100%; /* Set width to 100% to cover full screen width */
+    height: 100px;
+    background-color: #d1e7b9;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #4d4d4d;
+  }
+  
+  /* Main content layout */
+  .dashboard-content {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+  }
+  
+  /* Sidebar styles */
+  .sidebar {
+    width: 200px;
+    background-color: #f0f0f0;
     padding: 20px;
   }
   
-  .header {
-    margin-bottom: 20px;
+  .sidebar-btn {
+    display: block;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.3s ease;
   }
   
-  h1 {
-    font-size: 24px;
-    color: #4a5f3f;
+  .sidebar-btn:hover {
+    background-color: #d1e7b9;
   }
   
-  p {
-    color: #7a7a7a;
+  /* Table section */
+  .table-section {
+    flex: 2;
+    padding: 20px;
+    height: 100%;
   }
   
+  /* Table content */
+  /* Add table styles and content here */
+  
+  /* Queue section */
+  .queue-section {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    height: 100%;
+  }
+  
+  /* Spotify queue content */
+  /* Add Spotify queue styles and content here */
+  
+  /* Music player section */
+  .music-player {
+    background-color: #f5f5f5;
+    padding: 15px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  
+  /* Music player controls */
+  /* Add music player control styles and content here */
