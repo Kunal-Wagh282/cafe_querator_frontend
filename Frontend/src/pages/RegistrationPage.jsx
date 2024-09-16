@@ -70,7 +70,7 @@ const RegistrationPage = () => {
       // If the API response is successful, navigate to the Spotify login page
       if (response.status === 201 || response.status === 200) {
         console.log('Registration successful:', response.data);
-        navigate('/spotify-login');  // Redirect to the Spotify login page
+        navigate('/');  // Redirect to the Spotify login page
       }
 
     } catch (error) {

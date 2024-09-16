@@ -28,7 +28,7 @@ const LoginPage = () => {
         localStorage.setItem('cafeData', JSON.stringify(cafeData)); // Store cafe data in localStorage
 
         // Navigate to the dashboard page
-        navigate('/Dashboard');
+        navigate('/spotify-login');
       } else {
         alert('Invalid username or password');
       }
