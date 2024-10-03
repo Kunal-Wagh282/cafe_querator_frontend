@@ -1,0 +1,112 @@
+/* Container for the entire dashboard */
+.dashboard-container {
+  display: grid;
+  grid-template-rows: 10vh auto; /* 10vh for the header, rest for the content */
+  grid-template-columns: 1fr auto 1fr; /* Sidebar, main section, queue section */
+  height: 100vh; /* Full height of the viewport */
+  width: 100vw; /* Full width of the viewport */
+}
+
+/* Header section */
+.dashboard-header {
+  grid-column: 1 / -1; /* Span all columns to cover full width */
+  background-color: #f4f4f4; /* Customize the background color */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; /* Full width of the screen */
+  height: 10vh; /* 1/10th of the screen height */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+}
+
+/* Header text styling */
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.dashboard-header p {
+  margin: 0;
+  font-size: 1rem;
+  color: #666; /* Customize the text color */
+}
+
+/* Content section */
+.dashboard-content {
+  grid-column: 1 / -1; /* Span all columns */
+  display: grid;
+  grid-template-columns: 200px auto 200px; /* Sidebar, main section, queue section */
+  height: calc(100vh - 10vh); /* Space between the header and music player */
+  background-color: #fff;
+}
+
+/* Sidebar styling */
+.sidebar {
+  background-color: #e0e0e0;
+  padding: 20px;
+  height: 100%; /* Fill the full height of content area */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Sidebar buttons */
+.sidebar-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.sidebar-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Main section styling */
+.main-section {
+  background-color: #ffffff; /* Different background color for distinction */
+  padding: 20px; /* Add padding inside the main section */
+  height: 100%; /* Match the height of the sidebar */
+  border-radius: 8px; /* Rounded corners for visual distinction */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Queue section styling */
+.queue-section {
+  background-color: #f0f0f0; /* Different background color for distinction */
+  padding: 20px;
+  height: 100%; /* Fill the full height of the content area */
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px; /* Rounded corners for visual distinction */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Optional music player styling */
+.music-player {
+  background-color: #dcdcdc;
+  position: fixed; /* Fix the player at the bottom of the screen */
+  bottom: 0; /* Align it to the bottom */
+  left: 0; /* Align it to the leftmost part of the screen */
+  width: 100%; /* Full width of the screen */
+  height: 10vh; /* Same height as the header */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for visual effect */
+}
+
+/* Player bar content (e.g., controls) */
+.player-bar {
+  width: 100%; /* Full width for content inside */
+  text-align: center; /* Center the content inside the player */
+  font-size: 1rem; /* Adjust font size for controls */
+  color: #333; /* Customize text color */
+}
