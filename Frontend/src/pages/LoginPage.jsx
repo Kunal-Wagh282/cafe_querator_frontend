@@ -1,33 +1,30 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios for API requests
-import '../styles/LoginPage.css'; // Add your styles here
-import cafeImage from '../images/LoginPage.png'; // Ensure this path is correct
+import axios from 'axios';
+import '../styles/LoginPage.css';
+import cafeImage from '../images/LoginPage.png';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      // Make API request to login
-      const response = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
+      // POST request to login and set the token
+      const postResponse = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
         email: username,
         password: password
       });
 
-      // Check if response is successful and has the expected structure
-      if (response.data && response.data.message === 'token set') {
+      if (postResponse.data && postResponse.data.message === 'token set') {
         console.log('Login successful');
-
-        // Store the received data for use in the dashboard
-        const cafeData = JSON.parse(response.data.data.replace(/'/g, '"')); // Convert single quotes to double quotes for JSON parsing
-        localStorage.setItem('cafeData', JSON.stringify(cafeData)); // Store cafe data in localStorage
-
-        // Navigate to the dashboard page
+        
+        // Navigate to Spotify login
         navigate('/spotify-login');
       } else {
         alert('Invalid username or password');
@@ -35,6 +32,8 @@ const LoginPage = () => {
     } catch (error) {
       console.error('Error logging in:', error);
       alert('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,7 +61,9 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button type="submit">Login</button>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
           </form>
           <p>
             Don't have an account? <Link to="/register">Register here !!</Link>
