@@ -12,18 +12,15 @@ const Dashboard = () => {
 
   // Effect to handle fetching token and cafe info
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search); // Create a query object from the search parameters
-    const authorizationCode = query.get('code'); // Extract authorization code from the query parameters
+    const query = new URLSearchParams(window.location.search);
+    const authorizationCode = query.get('code');
 
-    // Check if authorization code is present
     if (authorizationCode) {
-      // Exchange the authorization code for access and refresh tokens
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken, refreshToken, expiresAt }) => {
-          // Send tokens to backend
           sendTokenToBackend(accessToken, refreshToken, expiresAt)
             .then(() => {
-              fetchCafeAndTokenInfo(accessToken); // Fetch cafe info using the access token
+              fetchCafeInfo(); // Fetch cafe info
             })
             .catch((error) => {
               setErrorMessage("Failed to store token data.");
@@ -35,20 +32,17 @@ const Dashboard = () => {
           console.error('Error exchanging authorization code:', error);
         });
 
-      // Clear the query from the URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } else {
       setErrorMessage("Failed to retrieve authorization code. Please try logging in again.");
-      // Optionally navigate back to login
-      // navigate('/');
     }
   }, [navigate]);
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
-    const clientID = '44c18fde03114e6db92a1d4deafd6a43'; // Your Spotify client ID
-    const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454'; // Your Spotify client secret
-    const redirectUri = 'http://localhost:5173/dashboard'; // Your redirect URI
+    const clientID = '44c18fde03114e6db92a1d4deafd6a43';
+    const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
+    const redirectUri = 'http://localhost:5173/dashboard';
 
     try {
       const response = await axios.post('https://accounts.spotify.com/api/token', null, {
@@ -66,13 +60,7 @@ const Dashboard = () => {
 
       const { access_token, refresh_token, expires_in } = response.data;
 
-      // Calculate expiration time
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
-
-      console.log("Access Token:", access_token);
-      console.log("Refresh Token:", refresh_token);
-      console.log("Expires At:", expiresAt);
-  
 
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
@@ -80,43 +68,31 @@ const Dashboard = () => {
     }
   };
 
-  // Function to send tokens to backend
+  // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      console.log("Sending token to backend:", {
+      await axios.post('https://cafequerator-backend.onrender.com/api/settoken', {
         access_token: accessToken,
         refresh_token: refreshToken,
         expires_at: expiresAt,
-      });
-
-      const response = await axios.post('https://cafequerator-backend.onrender.com/api/settoken', {
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        expires_at: expiresAt, // Send expires_at to the backend
-      });
-
-      console.log("Token successfully sent:", response.data);
+      }, { withCredentials: true }); // Added withCredentials
     } catch (error) {
-      console.error('Error sending tokens to backend:', error.response ? error.response.data : error.message);
-      throw new Error('Error sending tokens to backend');
+      throw new Error('Error sending token to backend');
     }
   };
 
-  // Function to fetch cafe and token info
-  const fetchCafeAndTokenInfo = async (accessToken) => {
+  // Function to fetch cafe info
+  const fetchCafeInfo = async () => {
     try {
       const response = await axios.get('https://cafequerator-backend.onrender.com/api/login', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`, // Include the access token in the request
-        },
+        withCredentials: true, // Added withCredentials
       });
       const { cafe_info } = response.data;
 
       const parsedCafeInfo = JSON.parse(cafe_info.replace(/'/g, '"'));
       setCafeInfo(parsedCafeInfo);
-      
-      console.log('Cafe Info:', parsedCafeInfo);
 
+      console.log('Cafe Info:', parsedCafeInfo);
     } catch (error) {
       setErrorMessage("Failed to fetch cafe information.");
       console.error('Error fetching data:', error);
@@ -126,7 +102,7 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/logout');
+      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}, { withCredentials: true }); // Added withCredentials
       navigate('/'); // Redirect to home or login page
     } catch (error) {
       setErrorMessage("Failed to log out. Please try again.");

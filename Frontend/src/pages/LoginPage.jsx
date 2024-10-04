@@ -15,10 +15,12 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // POST request to login and set the token
+      // POST request to login and set the token, including credentials (cookies)
       const postResponse = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
         email: username,
         password: password
+      }, {
+        withCredentials: true  // Ensure cookies (like JWT) are sent with the request
       });
 
       if (postResponse.data && postResponse.data.message === 'token set') {
