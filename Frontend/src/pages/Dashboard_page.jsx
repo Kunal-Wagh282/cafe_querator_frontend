@@ -14,6 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const authorizationCode = query.get('code');
+    console.log("authorization_code :",authorizationCode)
 
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
@@ -60,7 +61,14 @@ const Dashboard = () => {
 
       const { access_token, refresh_token, expires_in } = response.data;
 
+      console.log("access_token :",access_token);
+      console.log("refresh_token",refresh_token);
+
+
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
+
+      console.log("expires_at",expiresAt);
+
 
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
