@@ -7,14 +7,16 @@ const Dashboard = () => {
   // State variables
   const [cafeInfo, setCafeInfo] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-
   const navigate = useNavigate();
+
+
+  
 
   // Effect to handle fetching token and cafe info
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    const authorizationCode = query.get('code');
-
+    const authorizationCode = query.get('access_token');
+    console.log(authorizationCode)
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken, refreshToken, expiresAt }) => {
