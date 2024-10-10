@@ -115,3 +115,5 @@ node_modules/
 # Temporary build files
 temp/
 tmp/
+
+.env.txt
