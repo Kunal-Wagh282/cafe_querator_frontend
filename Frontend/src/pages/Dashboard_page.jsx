@@ -7,14 +7,16 @@ const Dashboard = () => {
   // State variables
   const [cafeInfo, setCafeInfo] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
   const [searchQuery, setSearchQuery] = useState(""); // For search input
   const [searchResults, setSearchResults] = useState([]); // To store search results
   const [accessToken, setAccessToken] = useState(""); // For storing access token
   const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
   const [features, setSongFeatures] = useState([]);
-
-
   const navigate = useNavigate();
+
+
+  
 
   // Effect to handle fetching token and cafe info
   useEffect(() => {
