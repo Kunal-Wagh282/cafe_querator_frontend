@@ -21,6 +21,7 @@ const Dashboard = () => {
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken, refreshToken, expiresAt }) => {
+          console.log(accessToken,"//////////",refreshToken,"//////////",expiresAt)
           sendTokenToBackend(accessToken, refreshToken, expiresAt)
             .then(() => {
               fetchCafeInfo(); // Fetch cafe info
@@ -60,18 +61,8 @@ const Dashboard = () => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-
       const { access_token, refresh_token, expires_in } = response.data;
-
-      console.log("access_token :",access_token);
-      console.log("refresh_token",refresh_token);
-
-
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
-
-      console.log("expires_at",expiresAt);
-
-
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
       throw new Error('Error exchanging authorization code');
@@ -81,12 +72,14 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
+      console.log(accessToken,"//////////",refreshToken,"//////////",expiresAt)
       await axios.post('https://cafequerator-backend.onrender.com/api/settoken', {
         access_token: accessToken,
         refresh_token: refreshToken,
         expires_at: expiresAt,
-      }, { withCredentials: true }); // Added withCredentials
+      }); // Added withCredentials
     } catch (error) {
+      console.error('Error sending token to backend:', error.response ? error.response.data : error.message);
       throw new Error('Error sending token to backend');
     }
   };
