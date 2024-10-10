@@ -7,6 +7,12 @@ const Dashboard = () => {
   // State variables
   const [cafeInfo, setCafeInfo] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState(""); // For search input
+  const [searchResults, setSearchResults] = useState([]); // To store search results
+  const [accessToken, setAccessToken] = useState(""); // For storing access token
+  const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
+  const [features, setSongFeatures] = useState([]);
   const navigate = useNavigate();
 
 
@@ -16,28 +22,21 @@ const Dashboard = () => {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const authorizationCode = query.get('code');
-    console.log("authorization_code :",authorizationCode)
 
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken, refreshToken, expiresAt }) => {
-          sendTokenToBackend(accessToken, refreshToken, expiresAt)
-            .then(() => {
-              fetchCafeInfo(); // Fetch cafe info
-            })
-            .catch((error) => {
-              setErrorMessage("Failed to store token data.");
-              console.error('Error sending tokens to backend:', error);
-            });
+          setAccessToken(accessToken); // Set access token
+          return sendTokenToBackend(accessToken, refreshToken, expiresAt);
+        })
+        .then(() => {
+          fetchCafeInfo(); // Fetch cafe info
         })
         .catch((error) => {
-          setErrorMessage("Failed to exchange authorization code for tokens.");
-          console.error('Error exchanging authorization code:', error);
+          console.error('Error during authorization:', error);
         });
 
       window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-      setErrorMessage("Failed to retrieve authorization code. Please try logging in again.");
     }
   }, [navigate]);
 
@@ -63,14 +62,7 @@ const Dashboard = () => {
 
       const { access_token, refresh_token, expires_in } = response.data;
 
-      console.log("access_token :",access_token);
-      console.log("refresh_token",refresh_token);
-
-
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
-
-      console.log("expires_at",expiresAt);
-
 
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
@@ -101,10 +93,7 @@ const Dashboard = () => {
 
       const parsedCafeInfo = JSON.parse(cafe_info.replace(/'/g, '"'));
       setCafeInfo(parsedCafeInfo);
-
-      console.log('Cafe Info:', parsedCafeInfo);
     } catch (error) {
-      setErrorMessage("Failed to fetch cafe information.");
       console.error('Error fetching data:', error);
     }
   };
@@ -115,9 +104,105 @@ const Dashboard = () => {
       await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}, { withCredentials: true }); // Added withCredentials
       navigate('/'); // Redirect to home or login page
     } catch (error) {
-      setErrorMessage("Failed to log out. Please try again.");
+      console.error("Failed to log out. Please try again.");
     }
   };
+
+  // Function to search songs using Spotify API
+  const searchSongs = async (query) => {
+    if (!accessToken) return [];
+
+    const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
+
+    try {
+      console.log("access_token",accessToken)
+      const response = await axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log('Search Response:', response.data); // Log the response data
+      return response.data.tracks.items; // Return search results
+    } catch (error) {
+      console.error('Error searching for songs:', error);
+      return []; // Return an empty array on error
+    }
+  };
+
+// Function to fetch song features by track ID
+const fetchSongFeatures = async (trackId) => {
+  if (!accessToken) return null;
+
+  const endpoint = `https://api.spotify.com/v1/audio-features/${trackId}`;
+
+  try {
+    const response = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log("Features",response.data)
+    return response.data; // Return song features
+  } catch (error) {
+    console.error('Error fetching song features:', error);
+    return null; // Return null on error
+  }
+};
+
+  // Handle search form submission
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    if (searchQuery) {
+      const results = await searchSongs(searchQuery);
+  
+      if (results.length > 0) {
+        const selectedTrack = results[0]; // Assuming the first result is what the user meant
+        const trackId = selectedTrack.id;
+        
+        // Fetch the song features
+        const features = await fetchSongFeatures(trackId);
+        
+        if (features) {
+          // Store the features (e.g., danceability, energy, etc.)
+          setSongFeatures(features); // Assume you have a state to store features
+        }
+      }
+    }
+  };
+  
+
+  // Function to fetch song suggestions
+  const fetchSuggestions = async (query) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+
+    const results = await searchSongs(query); // Await results
+    setSuggestions(results); // Store search results as suggestions
+  };
+
+
+
+  // Handle search input change
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    fetchSuggestions(value); // Fetch suggestions based on input
+  };
+
+
+  const handleSuggestionClick = (track) => {
+    // Set the input value to the selected track's name
+    setSearchQuery(track.name);
+  
+    // Clear the suggestions dropdown
+    setSuggestions([]);
+  
+    // Optionally, clear the search results if you are displaying them somewhere else
+    setSearchResults([]);
+  };
+  
 
   // Render the component
   return (
@@ -136,25 +221,49 @@ const Dashboard = () => {
         </div>
 
         <div className="main-section">
-          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          {cafeInfo ? (
-            <div className="table-section">
-              <h2>Cafe Details</h2>
-              <p>Name: {cafeInfo.Cafe_Name}</p>
-              <p>Address: {cafeInfo.Cafe_Address}</p>
-              <p>Contact: {cafeInfo.Cafe_Contact}</p>
-              <p>Owner: {cafeInfo.Owner_Name}</p>
-              <p>No. of Tables: {cafeInfo.No_of_Tables}</p>
-            </div>
-          ) : (
-            <p>Loading cafe information...</p>
-          )}
+          {/* Removed the error message and cafe information section */}
         </div>
 
         <div className="queue-section">
           <h2>Queue</h2>
           <div className="spotify-queue">
             <p>Spotify queue will display here</p>
+            <form onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                placeholder="Search for a song..."
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+              />
+              <button type="submit">Search</button>
+            </form>
+
+            {/* Display search results
+            {searchResults.length > 0 && (
+              <div className="search-results">
+                <h2>Search Results</h2>
+                <ul>
+                  {searchResults.map((track) => (
+                    <li key={track.id}>
+                      {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )} */}
+
+            {/* Display suggestions */}
+        {suggestions.length > 0 && (
+          <div className="suggestions">
+            <ul>
+              {suggestions.map((track) => (
+                <li key={track.id} onClick={() => handleSuggestionClick(track)}>
+                  {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
           </div>
         </div>
       </div>

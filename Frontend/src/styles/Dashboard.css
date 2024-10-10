@@ -110,3 +110,35 @@
   font-size: 1rem; /* Adjust font size for controls */
   color: #333; /* Customize text color */
 }
+
+
+/* Suggestions dropdown styling */
+.suggestions {
+  border: 1px solid #ccc; /* Border to distinguish suggestions */
+  background-color: #fff; /* Background color for the dropdown */
+  position: absolute; /* Position it absolutely below the input */
+  z-index: 10; /* Ensure it appears above other elements */
+  width: 25vh; /* Match the width of the input */
+  margin-top: 5px; /* Space between input and dropdown */
+  border-radius: 4px; /* Rounded corners for the dropdown */
+  max-height: 200px; /* Limit the height */
+  overflow-y: auto; /* Enable scrolling for overflow */
+}
+
+/* Suggestions list styling */
+.suggestions ul {
+  list-style-type: none; /* Remove default list styles */
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual suggestion item styling */
+.suggestions li {
+  padding: 10px; /* Add padding for clickable items */
+  cursor: pointer; /* Change cursor to pointer */
+}
+
+.suggestions li:hover {
+  background-color: #f0f0f0; /* Highlight suggestion on hover */
+}
+
