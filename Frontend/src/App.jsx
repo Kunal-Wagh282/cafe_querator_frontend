@@ -5,16 +5,20 @@ import RegistrationPage from './pages/RegistrationPage';
 import SpotifyLoginPage from './pages/SpotifyLoginPage';
 import Dashboard from './pages/Dashboard_page';
 import './App.css';
-
+import Table from './pages/Table';
+import Landing from './pages/Landing';
+import 'react-toastify/dist/ReactToastify.css';
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} /> {/* Default route - Login Page */}
+        
+        <Route path="/" element={<Landing />} /> 
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} /> {/* Registration Page */}
         <Route path="/spotify-login" element={<SpotifyLoginPage />} /> {/* Spotify Login Page */}
         <Route path="/dashboard" element={<Dashboard />} /> 
-
+        <Route path="/:cafename/table/:tableid" element={<Table/>} /> 
       </Routes>
     </Router>
   );

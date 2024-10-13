@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/LoginPage.css';
@@ -9,25 +9,22 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // POST request to login and set the token, including credentials (cookies)
       const postResponse = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
         email: username,
         password: password
-      }, {
-        withCredentials: true  // Ensure cookies (like JWT) are sent with the request
       });
 
       if (postResponse.data && postResponse.data.message === 'token set') {
-        console.log('Login successful');
         
+        localStorage.setItem("jwt", postResponse.data.jwt);
         // Navigate to Spotify login
-        navigate('/spotify-login');
+        navigate('/dashboard');
       } else {
         alert('Invalid username or password');
       }
@@ -39,9 +36,13 @@ const LoginPage = () => {
     }
   };
 
+  
+
   return (
     <div className="login-page">
+    
       <h1>Welcome to cafe-Qurator</h1>
+
       <div className="login-content">
         <div className="login-image">
           <img src={cafeImage} alt="Cafe Illustration" />
