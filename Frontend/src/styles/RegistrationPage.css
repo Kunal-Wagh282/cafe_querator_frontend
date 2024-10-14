@@ -1,0 +1,104 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4db; /* Light background color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .registration-content {
+    width: 120%;
+    max-width: 800px; /* Adjust the width as needed */
+    background-color: #f7f4e4; /* Cream color for the middle layer */
+    border-radius: 20px;
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  /* Container for the image */
+  .registration-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-right: 20px; /* Add some space between image and form */
+  }
+  
+  .registration-image img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+  
+  /* Container for the form fields */
+  .registration-form-container {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Form inside the container */
+  .registration-form-container h2 {
+    margin-bottom: 20px;
+    color: #000;
+    font-size: 24px;
+    text-align: center; /* Center align the heading */
+  }
+  
+  .registration-form-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .registration-form-container input {
+    width: 100%;
+    max-width: 400px; /* Limit input width */
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #f8e6ff;
+    font-size: 16px;
+    color : black ;
+  }
+  
+  .registration-form-container button {
+    width: 100%;
+    max-width: 400px; /* Limit button width */
+    padding: 12px;
+    margin-top: 10px;
+    background-color: #62c2ff;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .registration-form-container button:hover {
+    background-color: #3ba1e0;
+  }
+  
+  .registration-form-container p {
+    margin-top: 15px;
+    color: #666;
+  }
+  
+  .registration-form-container a {
+    color: #3ba1e0;
+    text-decoration: none;
+  }
+  
+  .registration-form-container a:hover {
+    text-decoration: underline;
+  }
+  
