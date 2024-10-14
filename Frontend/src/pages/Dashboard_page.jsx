@@ -16,15 +16,13 @@ const Dashboard = () => {
   const [currentTrack, setCurrentTrack] = useState(null); // For currently playing track
   const [isPlaying, setIsPlaying] = useState(false); // Playback status
   const [player, setPlayer] = useState(null); // State for the Spotify Player
-  
-
+  const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
   const navigate = useNavigate();
 
   // Effect to handle fetching token and cafe info
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const authorizationCode = query.get('code');
-
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken, refreshToken, expiresAt }) => {
@@ -42,42 +40,13 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-
   useEffect(() => {
-    // Load the Spotify Web Playback SDK
-    const script = document.createElement('script');
-    script.src = 'https://sdk.scdn.co/spotify-player.js';
-    script.async = true;
-    script.onload = () => {
-      // Initialize the player once the SDK is loaded
-      window.onSpotifyWebPlaybackSDKReady = () => {
-        initializePlayer();
-      };
-    };
-    document.body.appendChild(script); // Append the script to the body
+    fetchCafeInfo();
   
-      // Function to initialize the Spotify player
-  const initializePlayer = () => {
-    const newPlayer = new window.Spotify.Player({
-      name: 'Web Player',
-      getOAuthToken: cb => { cb(accessToken); },
-      volume: 0.5,
-    });
+    
+  }, [])
+  
 
-    // Event listeners for player state
-    newPlayer.addListener('ready', ({ device_id }) => {
-      console.log('Ready to play with Device ID', device_id);
-    });
-
-    newPlayer.addListener('not_ready', ({ device_id }) => {
-      console.log('Device ID has gone offline', device_id);
-    });
-
-    setPlayer(newPlayer);
-  };
- 
- 
-  });
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
@@ -102,7 +71,6 @@ const Dashboard = () => {
       const { access_token, refresh_token, expires_in } = response.data;
 
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
-
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
       throw new Error('Error exchanging authorization code');
@@ -112,11 +80,19 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/settoken', {
+      await axios.post('https://cafequerator-backend.onrender.com/api/settoken', 
+        {
         access_token: accessToken,
         refresh_token: refreshToken,
         expires_at: expiresAt,
-      }, { withCredentials: true }); // Added withCredentials
+      }, 
+      {
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'Content-Type': 'application/json', // Specify content type
+      }
+    }
+    ); // Added withCredentials
     } catch (error) {
       throw new Error('Error sending token to backend');
     }
@@ -126,12 +102,14 @@ const Dashboard = () => {
   const fetchCafeInfo = async () => {
     try {
       const response = await axios.get('https://cafequerator-backend.onrender.com/api/login', {
-        withCredentials: true, // Added withCredentials
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+        },
       });
-      const { cafe_info } = response.data;
 
-      const parsedCafeInfo = JSON.parse(cafe_info.replace(/'/g, '"'));
-      setCafeInfo(parsedCafeInfo);
+      const { cafe_info ,token_info } = response.data;
+      setAccessToken(token_info.access_token);
+      setCafeInfo(cafe_info);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -141,6 +119,7 @@ const Dashboard = () => {
   const handleLogout = async () => {
     try {
       await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}, { withCredentials: true }); // Added withCredentials
+      localStorage.removeItem("jwt");
       navigate('/'); // Redirect to home or login page
     } catch (error) {
       console.error("Failed to log out. Please try again.");
@@ -154,7 +133,6 @@ const Dashboard = () => {
     const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
 
     try {
-      console.log("access_token",accessToken)
       const response = await axios.get(endpoint, {
         headers: {
           Authorization: `Bearer ${accessToken}`,

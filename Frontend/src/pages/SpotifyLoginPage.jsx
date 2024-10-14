@@ -14,10 +14,7 @@ const SpotifyLoginPage = () => {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const code = query.get('code');
-
     if (code) {
-      console.log('Authorization Code:', code);
-      // Redirect to dashboard
       navigate('/dashboard');
     }
   }, [navigate]);
