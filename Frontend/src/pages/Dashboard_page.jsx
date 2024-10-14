@@ -22,7 +22,6 @@ const Dashboard = () => {
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
-  const jwt = localStorage.getItem("jwt");
   const CLIENT_ID = "44c18fde03114e6db92a1d4deafd6a43"; // Your Spotify client ID
   const REDIRECT_URI = "http://localhost:5173/dashboard"; // Redirect URI after Spotify login
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
