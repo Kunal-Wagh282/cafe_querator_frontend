@@ -1,7 +1,51 @@
-import React from 'react';
-import '../styles/Table.css'; // Make sure to create a CSS file for styling
+import React, { useState, useEffect } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import '../styles/Table.css'; // Ensure CSS for styling
 
 const Table = () => {
+  const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL
+  const location = useLocation(); // Access the query parameters
+  const searchParams = new URLSearchParams(location.search); // Create a URLSearchParams object from the location search
+  const cafeId = searchParams.get('id'); // Extracts 'id' from the query string
+  const [cjwt, setCJwt] = useState('');
+
+  useEffect(() => {
+    // Fetch JWT token once the component mounts
+    setJwtToken(); // Call the token fetch function
+  }, [cafeId]); // Re-run if cafeId changes
+        
+
+  const fetchToken = async () => {
+    try {
+      const response = await axios.get('https://cafequerator-backend.onrender.com/customer/api/getaccess', {
+        headers: {
+          'Authorization': `Bearer ${cjwt}`,
+        },
+      });
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+
+  const setJwtToken = async () => {
+    try {
+      const response = await axios.get('https://cafequerator-backend.onrender.com/customer/api/login', {
+        cafeId: cafeId , // Correct way to send query parameters in GET request
+      });
+
+      if (response.status === 200) {
+        console.log(response.data);
+        localStorage.setItem('cjwt', response.data.jwt); // Store JWT in localStorage
+        setCJwt(response.data.jwt); // Store the JWT in state
+      }
+    } catch (error) {
+      console.error('Error fetching JWT:', error);
+    }
+  };
+
   return (
     <div className="table-container">
       {/* Search Bar */}
