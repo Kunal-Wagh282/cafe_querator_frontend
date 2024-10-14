@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
+
 
 const Dashboard = () => {
   // State variables
@@ -12,7 +13,10 @@ const Dashboard = () => {
   const [accessToken, setAccessToken] = useState(""); // For storing access token
   const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
   const [features, setSongFeatures] = useState([]);
-
+  const [currentTrack, setCurrentTrack] = useState(null); // For currently playing track
+  const [isPlaying, setIsPlaying] = useState(false); // Playback status
+  const [player, setPlayer] = useState(null); // State for the Spotify Player
+  
 
   const navigate = useNavigate();
 
@@ -37,6 +41,43 @@ const Dashboard = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [navigate]);
+
+
+  useEffect(() => {
+    // Load the Spotify Web Playback SDK
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
+    script.onload = () => {
+      // Initialize the player once the SDK is loaded
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        initializePlayer();
+      };
+    };
+    document.body.appendChild(script); // Append the script to the body
+  
+      // Function to initialize the Spotify player
+  const initializePlayer = () => {
+    const newPlayer = new window.Spotify.Player({
+      name: 'Web Player',
+      getOAuthToken: cb => { cb(accessToken); },
+      volume: 0.5,
+    });
+
+    // Event listeners for player state
+    newPlayer.addListener('ready', ({ device_id }) => {
+      console.log('Ready to play with Device ID', device_id);
+    });
+
+    newPlayer.addListener('not_ready', ({ device_id }) => {
+      console.log('Device ID has gone offline', device_id);
+    });
+
+    setPlayer(newPlayer);
+  };
+ 
+ 
+  });
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
@@ -202,6 +243,53 @@ const fetchSongFeatures = async (trackId) => {
   };
   
 
+  // Function to pause the song
+const pauseSong = () => {
+  if (audioRef.current) {
+    audioRef.current.pause(); // Pause the current audio
+    setIsPlaying(false); // Update playback status
+  }
+};
+
+// Function to resume playback
+const resumeSong = () => {
+  if (audioRef.current) {
+    audioRef.current.play(); // Resume playback
+    setIsPlaying(true); // Update playback status
+  }
+};
+
+// Function to skip to the next track (if you have a queue)
+const nextSong = () => {
+  const currentIndex = searchResults.findIndex(track => track.id === currentTrack.id);
+  const nextTrack = searchResults[(currentIndex + 1) % searchResults.length]; // Get the next song in the queue
+  
+  playSong(nextTrack); // Play the next song
+};
+
+
+  // Function to play a selected song
+  const playSong = (track) => {
+    if (!player) return;
+
+    // Set the current track details
+    setCurrentTrack(track);
+    
+    // Use the Spotify player SDK to play the track
+    player.connect().then((success) => {
+      if (success) {
+        player.play({
+          uris: [track.uri], // Use the track URI to play
+        });
+        setIsPlaying(true); // Update playback status
+      }
+    });
+  };
+
+const audioRef = useRef(null);
+
+
+
   // Render the component
   return (
     <div className="dashboard-container">
@@ -267,10 +355,14 @@ const fetchSongFeatures = async (trackId) => {
       </div>
 
       <div className="music-player">
-        <div className="player-bar">
-          <p>Spotify player controls will go here</p>
+          <div className="player-bar">
+            <p>{currentTrack ? `${currentTrack.name} by ${currentTrack.artists.map(artist => artist.name).join(', ')}` : 'No song playing'}</p>
+            <button onClick={isPlaying ? pauseSong : resumeSong}>
+              {isPlaying ? 'Pause' : 'Play'}
+            </button>
+            <button onClick={nextSong}>Next</button>
+          </div>
         </div>
-      </div>
     </div>
   );
 };
