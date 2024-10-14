@@ -1,39 +1,52 @@
 import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
+import Toast from '../components/Toast'; // Optional, remove if you no longer use Toast
 
 
 const Dashboard = () => {
   // State variables
   const [cafeInfo, setCafeInfo] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [searchQuery, setSearchQuery] = useState(""); // For search input
-  const [searchResults, setSearchResults] = useState([]); // To store search results
-  const [accessToken, setAccessToken] = useState(""); // For storing access token
-  const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [accessToken, setAccessToken] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
   const [features, setSongFeatures] = useState([]);
   const [currentTrack, setCurrentTrack] = useState(null); // For currently playing track
   const [isPlaying, setIsPlaying] = useState(false); // Playback status
   const [player, setPlayer] = useState(null); // State for the Spotify Player
   const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
+  const [isTokenSet, setIsTokenSet] = useState(false); // Track token state
+  const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
+  const params = useParams();
+  const jwt = localStorage.getItem("jwt");
+  const CLIENT_ID = "44c18fde03114e6db92a1d4deafd6a43"; // Your Spotify client ID
+  const REDIRECT_URI = "http://localhost:5173/dashboard"; // Redirect URI after Spotify login
+  const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
+  const RESPONSE_TYPE = "code"; // Using authorization code flow
+  const SCOPE = "user-read-private user-read-email"; // Add necessary scopes
+
+  useEffect(() => {
+    fetchCafeInfo(); // Fetch cafe info 
+  }, []);
 
   // Effect to handle fetching token and cafe info
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const authorizationCode = query.get('code');
+
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
-        .then(({ accessToken, refreshToken, expiresAt }) => {
+        .then(({ accessToken }) => {
           setAccessToken(accessToken); // Set access token
-          return sendTokenToBackend(accessToken, refreshToken, expiresAt);
-        })
-        .then(() => {
-          fetchCafeInfo(); // Fetch cafe info
+          setIsTokenSet(true); // Set token state to true on successful login
         })
         .catch((error) => {
           console.error('Error during authorization:', error);
+          setIsTokenSet(false); // Set token state to false on error
         });
 
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -50,9 +63,9 @@ const Dashboard = () => {
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
-    const clientID = '44c18fde03114e6db92a1d4deafd6a43';
+    const clientID = CLIENT_ID;
     const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
-    const redirectUri = 'http://localhost:5173/dashboard';
+    const redirectUri = REDIRECT_URI;
 
     try {
       const response = await axios.post('https://accounts.spotify.com/api/token', null, {
@@ -67,7 +80,6 @@ const Dashboard = () => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-
       const { access_token, refresh_token, expires_in } = response.data;
 
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
@@ -76,6 +88,7 @@ const Dashboard = () => {
       throw new Error('Error exchanging authorization code');
     }
   };
+
 
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
@@ -109,6 +122,7 @@ const Dashboard = () => {
 
       const { cafe_info ,token_info } = response.data;
       setAccessToken(token_info.access_token);
+
       setCafeInfo(cafe_info);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -118,7 +132,8 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}, { withCredentials: true }); // Added withCredentials
+
+      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}); 
       localStorage.removeItem("jwt");
       navigate('/'); // Redirect to home or login page
     } catch (error) {
@@ -138,7 +153,6 @@ const Dashboard = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log('Search Response:', response.data); // Log the response data
       return response.data.tracks.items; // Return search results
     } catch (error) {
       console.error('Error searching for songs:', error);
@@ -146,25 +160,24 @@ const Dashboard = () => {
     }
   };
 
-// Function to fetch song features by track ID
-const fetchSongFeatures = async (trackId) => {
-  if (!accessToken) return null;
+  // Function to fetch song features by track ID
+  const fetchSongFeatures = async (trackId) => {
+    if (!accessToken) return null;
 
-  const endpoint = `https://api.spotify.com/v1/audio-features/${trackId}`;
+    const endpoint = `https://api.spotify.com/v1/audio-features/${trackId}`;
 
-  try {
-    const response = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log("Features",response.data)
-    return response.data; // Return song features
-  } catch (error) {
-    console.error('Error fetching song features:', error);
-    return null; // Return null on error
-  }
-};
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data; // Return song features
+    } catch (error) {
+      console.error('Error fetching song features:', error);
+      return null; // Return null on error
+    }
+  };
 
   // Handle search form submission
   const handleSearchSubmit = async (e) => {
@@ -180,13 +193,11 @@ const fetchSongFeatures = async (trackId) => {
         const features = await fetchSongFeatures(trackId);
         
         if (features) {
-          // Store the features (e.g., danceability, energy, etc.)
-          setSongFeatures(features); // Assume you have a state to store features
+          setSongFeatures(features); // Store the features (e.g., danceability, energy, etc.)
         }
       }
     }
   };
-  
 
   // Function to fetch song suggestions
   const fetchSuggestions = async (query) => {
@@ -199,7 +210,12 @@ const fetchSongFeatures = async (trackId) => {
     setSuggestions(results); // Store search results as suggestions
   };
 
-
+  // Function to handle Spotify login
+  const handleSpotifyLogin = () => {
+    const loginUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
+    window.location.href = loginUrl; // Redirect to the Spotify login page
+    setIsTokenSet(True)
+  };
 
   // Handle search input change
   const handleSearchInputChange = (e) => {
@@ -207,7 +223,6 @@ const fetchSongFeatures = async (trackId) => {
     setSearchQuery(value);
     fetchSuggestions(value); // Fetch suggestions based on input
   };
-
 
   const handleSuggestionClick = (track) => {
     // Set the input value to the selected track's name
@@ -220,6 +235,7 @@ const fetchSongFeatures = async (trackId) => {
     setSearchResults([]);
   };
   
+
 
   // Function to pause the song
 const pauseSong = () => {
@@ -268,6 +284,7 @@ const audioRef = useRef(null);
 
 
 
+
   // Render the component
   return (
     <div className="dashboard-container">
@@ -282,55 +299,54 @@ const audioRef = useRef(null);
           <h1>Dashboard</h1>
           <button className="sidebar-btn">Home</button>
           <button className="sidebar-btn">Admin</button>
+          <button
+            className='sidebar-btn'
+            style={{ backgroundColor: isTokenSet ? 'gray' : 'green', color: 'white' }} // Change color based on token status
+            onClick={handleSpotifyLogin}
+            disabled={isTokenSet} // Disable button if token is set
+          >
+            {isTokenSet ? 'Logged In' : 'Login to Spotify'}
+          </button>
         </div>
 
         <div className="main-section">
-          {/* Removed the error message and cafe information section */}
-        </div>
+          <form onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              placeholder="Search for songs..."
+            />
+            <button type="submit">Search</button>
+          </form>
 
-        <div className="queue-section">
-          <h2>Queue</h2>
-          <div className="spotify-queue">
-            <p>Spotify queue will display here</p>
-            <form onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                placeholder="Search for a song..."
-                value={searchQuery}
-                onChange={handleSearchInputChange}
-              />
-              <button type="submit">Search</button>
-            </form>
-
-            {/* Display search results
-            {searchResults.length > 0 && (
-              <div className="search-results">
-                <h2>Search Results</h2>
-                <ul>
-                  {searchResults.map((track) => (
-                    <li key={track.id}>
-                      {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )} */}
-
-            {/* Display suggestions */}
-        {suggestions.length > 0 && (
-          <div className="suggestions">
-            <ul>
+          {/* Display search results or suggestions */}
+          {suggestions.length > 0 && (
+            <ul className="suggestions-list">
               {suggestions.map((track) => (
                 <li key={track.id} onClick={() => handleSuggestionClick(track)}>
-                  {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
+                  {track.name}
                 </li>
               ))}
             </ul>
-          </div>
-        )}
-          </div>
+          )}
+          {features && (
+            <div>
+              <h2>Song Features:</h2>
+              <ul>
+                <li>Danceability: {features.danceability}</li>
+                <li>Energy: {features.energy}</li>
+                <li>Key: {features.key}</li>
+                <li>Loudness: {features.loudness}</li>
+                <li>Mode: {features.mode}</li>
+                <li>Speechiness: {features.speechiness}</li>
+                <li>Tempo: {features.tempo}</li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
+
 
       <div className="music-player">
           <div className="player-bar">
@@ -341,6 +357,10 @@ const audioRef = useRef(null);
             <button onClick={nextSong}>Next</button>
           </div>
         </div>
+
+      {/* Optional Toast Notification for error messages */}
+      {showToast && <Toast message={errorMessage} onClose={() => setShowToast(false)} />}
+
     </div>
   );
 };

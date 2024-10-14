@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/LoginPage.css';
@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [expiresAt, setExpiresAt] = useState('');
   const navigate = useNavigate();
+
   const [jwt, setJwt] = useState('');
 
   const handleLogin = async (e) => {
@@ -17,7 +18,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // POST request to login and set the token, no need for Authorization header here
+
       const postResponse = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
         email: username,
         password: password
@@ -25,6 +26,7 @@ const LoginPage = () => {
 
 
       if (postResponse.data && postResponse.data.message === 'token set') {
+
         console.log('Login successful');
         localStorage.setItem('jwt', postResponse.data.jwt);  // Store the new token
         setJwt(postResponse.data.jwt);
@@ -36,6 +38,7 @@ const LoginPage = () => {
           navigate('/spotify-login');
         }
           
+      
       } else {
         alert('Invalid username or password');
       }
@@ -46,6 +49,7 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+
 
   const accessTokenIsSet = async (jwt) => {
     try {
@@ -83,9 +87,12 @@ const LoginPage = () => {
     return new Date(expiresAt) < now; // Compare with current time
   };
 
+
   return (
     <div className="login-page">
+    
       <h1>Welcome to cafe-Qurator</h1>
+
       <div className="login-content">
         <div className="login-image">
           <img src={cafeImage} alt="Cafe Illustration" />
