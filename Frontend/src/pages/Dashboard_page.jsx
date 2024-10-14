@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
 import Toast from '../components/Toast'; // Optional, remove if you no longer use Toast
+
 
 const Dashboard = () => {
   // State variables
@@ -13,6 +14,10 @@ const Dashboard = () => {
   const [accessToken, setAccessToken] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [features, setSongFeatures] = useState([]);
+  const [currentTrack, setCurrentTrack] = useState(null); // For currently playing track
+  const [isPlaying, setIsPlaying] = useState(false); // Playback status
+  const [player, setPlayer] = useState(null); // State for the Spotify Player
+  const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
   const [isTokenSet, setIsTokenSet] = useState(false); // Track token state
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
@@ -32,7 +37,7 @@ const Dashboard = () => {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const authorizationCode = query.get('code');
-    
+
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken }) => {
@@ -47,6 +52,14 @@ const Dashboard = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [navigate]);
+
+  useEffect(() => {
+    fetchCafeInfo();
+  
+    
+  }, [])
+  
+
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
@@ -76,6 +89,28 @@ const Dashboard = () => {
     }
   };
 
+
+  // Function to send token data to the backend
+  const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
+    try {
+      await axios.post('https://cafequerator-backend.onrender.com/api/settoken', 
+        {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        expires_at: expiresAt,
+      }, 
+      {
+      headers: {
+        'Authorization': `Bearer ${jwt}`,
+        'Content-Type': 'application/json', // Specify content type
+      }
+    }
+    ); // Added withCredentials
+    } catch (error) {
+      throw new Error('Error sending token to backend');
+    }
+  };
+
   // Function to fetch cafe info
   const fetchCafeInfo = async () => {
     try {
@@ -84,8 +119,10 @@ const Dashboard = () => {
           'Authorization': `Bearer ${jwt}`,
         },
       });
-      setIsTokenSet(response.data.token_info !== "Not set"); // Update token state
-      const { cafe_info } = response.data;
+
+      const { cafe_info ,token_info } = response.data;
+      setAccessToken(token_info.access_token);
+
       setCafeInfo(cafe_info);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -95,6 +132,7 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
+
       await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}); 
       localStorage.removeItem("jwt");
       navigate('/'); // Redirect to home or login page
@@ -197,6 +235,56 @@ const Dashboard = () => {
     setSearchResults([]);
   };
   
+
+
+  // Function to pause the song
+const pauseSong = () => {
+  if (audioRef.current) {
+    audioRef.current.pause(); // Pause the current audio
+    setIsPlaying(false); // Update playback status
+  }
+};
+
+// Function to resume playback
+const resumeSong = () => {
+  if (audioRef.current) {
+    audioRef.current.play(); // Resume playback
+    setIsPlaying(true); // Update playback status
+  }
+};
+
+// Function to skip to the next track (if you have a queue)
+const nextSong = () => {
+  const currentIndex = searchResults.findIndex(track => track.id === currentTrack.id);
+  const nextTrack = searchResults[(currentIndex + 1) % searchResults.length]; // Get the next song in the queue
+  
+  playSong(nextTrack); // Play the next song
+};
+
+
+  // Function to play a selected song
+  const playSong = (track) => {
+    if (!player) return;
+
+    // Set the current track details
+    setCurrentTrack(track);
+    
+    // Use the Spotify player SDK to play the track
+    player.connect().then((success) => {
+      if (success) {
+        player.play({
+          uris: [track.uri], // Use the track URI to play
+        });
+        setIsPlaying(true); // Update playback status
+      }
+    });
+  };
+
+const audioRef = useRef(null);
+
+
+
+
   // Render the component
   return (
     <div className="dashboard-container">
@@ -259,8 +347,20 @@ const Dashboard = () => {
         </div>
       </div>
 
+
+      <div className="music-player">
+          <div className="player-bar">
+            <p>{currentTrack ? `${currentTrack.name} by ${currentTrack.artists.map(artist => artist.name).join(', ')}` : 'No song playing'}</p>
+            <button onClick={isPlaying ? pauseSong : resumeSong}>
+              {isPlaying ? 'Pause' : 'Play'}
+            </button>
+            <button onClick={nextSong}>Next</button>
+          </div>
+        </div>
+
       {/* Optional Toast Notification for error messages */}
       {showToast && <Toast message={errorMessage} onClose={() => setShowToast(false)} />}
+
     </div>
   );
 };

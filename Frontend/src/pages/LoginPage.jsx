@@ -8,23 +8,37 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [expiresAt, setExpiresAt] = useState('');
   const navigate = useNavigate();
-  
+
+  const [jwt, setJwt] = useState('');
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+
       const postResponse = await axios.post('https://cafequerator-backend.onrender.com/api/login', {
         email: username,
         password: password
       });
 
+
       if (postResponse.data && postResponse.data.message === 'token set') {
-        
-        localStorage.setItem("jwt", postResponse.data.jwt);
-        // Navigate to Spotify login
-        navigate('/dashboard');
+
+        console.log('Login successful');
+        localStorage.setItem('jwt', postResponse.data.jwt);  // Store the new token
+        setJwt(postResponse.data.jwt);
+
+        const accesstokenIsValid = await accessTokenIsSet(postResponse.data.jwt); // Await token check
+        if (accesstokenIsValid) {
+          navigate('/dashboard');
+        } else {
+          navigate('/spotify-login');
+        }
+          
+      
       } else {
         alert('Invalid username or password');
       }
@@ -36,7 +50,43 @@ const LoginPage = () => {
     }
   };
 
-  
+
+  const accessTokenIsSet = async (jwt) => {
+    try {
+      const response = await axios.get('https://cafequerator-backend.onrender.com/api/login', {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+        },
+      });
+
+      const { token_info } = response.data;
+      if (token_info && token_info !== "Not set") { 
+        setExpiresAt(token_info.expires_at);
+        return !isAccessTokenExpired(token_info.expires_at);
+      } else {
+        console.log("Token not set")
+        return false;
+      }      
+    } catch (error) {
+      console.error('Error fetching token info:', error);
+      return false;
+    }
+  };
+
+  // Function to check if the access token has expired
+  const isAccessTokenExpired = (expiresAt) => {
+    if (!expiresAt) {
+      return true; // If expiresAt is not set, consider it expired
+    }
+    const now = new Date();
+    if (new Date(expiresAt) < now) {
+      console.log("Access Token is Expired");
+    } else {
+      console.log("Access Token is Valid!");
+    }
+    return new Date(expiresAt) < now; // Compare with current time
+  };
+
 
   return (
     <div className="login-page">

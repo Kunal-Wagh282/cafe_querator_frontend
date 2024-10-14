@@ -8,6 +8,7 @@ import './App.css';
 import Table from './pages/Table';
 import Landing from './pages/Landing';
 import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <Router>
