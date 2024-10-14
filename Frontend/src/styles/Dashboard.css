@@ -10,7 +10,7 @@
 /* Header section */
 .dashboard-header {
   grid-column: 1 / -1; /* Span all columns to cover full width */
-  background-color: #f4f4f4; /* Customize the background color */
+  background-color: #6B7A40; /* Customize the background color */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,12 +24,15 @@
   margin: 0;
   font-size: 2rem;
   font-weight: bold;
+  align-items:left;
 }
 
 .dashboard-header p {
   margin: 0;
   font-size: 1rem;
   color: #666; /* Customize the text color */
+  text-align: left;
+  color : black ;
 }
 
 /* Content section */
@@ -43,7 +46,7 @@
 
 /* Sidebar styling */
 .sidebar {
-  background-color: #e0e0e0;
+  background-color: #F5F5DC;
   padding: 20px;
   height: 100%; /* Fill the full height of content area */
   display: flex;
@@ -53,15 +56,15 @@
 
 /* Sidebar buttons */
 .sidebar-btn {
-  background-color: #007bff;
-  color: white;
+  background-color: #D9D9D9;
+  color: black;
   padding: 10px 20px;
   margin-bottom: 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
-  text-align: left;
+  text-align: center;
   font-size: 1rem;
 }
 
@@ -71,7 +74,7 @@
 
 /* Main section styling */
 .main-section {
-  background-color: #ffffff; /* Different background color for distinction */
+  background-color: #F9F6F0; /* Different background color for distinction */
   padding: 20px; /* Add padding inside the main section */
   height: 100%; /* Match the height of the sidebar */
   border-radius: 8px; /* Rounded corners for visual distinction */
@@ -80,7 +83,7 @@
 
 /* Queue section styling */
 .queue-section {
-  background-color: #f0f0f0; /* Different background color for distinction */
+  background-color: #F5F5DC; /* Different background color for distinction */
   padding: 20px;
   height: 100%; /* Fill the full height of the content area */
   display: flex;
@@ -91,7 +94,7 @@
 
 /* Optional music player styling */
 .music-player {
-  background-color: #dcdcdc;
+  background-color: #F5F5DC;
   position: fixed; /* Fix the player at the bottom of the screen */
   bottom: 0; /* Align it to the bottom */
   left: 0; /* Align it to the leftmost part of the screen */

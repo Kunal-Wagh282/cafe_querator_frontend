@@ -272,8 +272,8 @@ const audioRef = useRef(null);
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Welcome to {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'}</h1>
-        <p>Let's change the vibe today!</p>
+        <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
+        <p><br /><br  /><br/>Let's change the vibe today!</p>
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </header>
 
@@ -285,6 +285,11 @@ const audioRef = useRef(null);
         </div>
 
         <div className="main-section">
+          <div>
+            <h1>Table</h1>
+          </div>
+        {/* <img src={DashboardPage} alt="Cafe Illustration" /> */}
+
           {/* Removed the error message and cafe information section */}
         </div>
 

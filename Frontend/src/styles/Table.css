@@ -1,0 +1,124 @@
+.table-container {
+  background-color: #f8f2dc; /* Light background */
+  padding: 20px; /* General padding */
+  padding-left: 30px; /* Specific left padding */
+  width: 100%; /* Full viewport width */
+  /* height: 100vh; Full viewport height */
+  margin: 0; /* Remove auto margin for full coverage */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+  overflow-y: auto; /* Enable scrolling if content exceeds the viewport */
+
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.queue-section,
+.current-song-section {
+  background-color: #fff; /* White background for the sections */
+  padding: 15px; /* Padding for the sections */
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 20px; /* Space between sections */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Layered shadow effect */
+  position: relative; /* For layering */
+  overflow: hidden; /* Clip the background gradient */
+}
+
+.queue-section h3,
+.current-song-section h3 {
+  margin: 0; /* Remove default margin */
+  font-size: 18px; /* Font size for section titles */
+}
+
+.queue-list {
+  list-style: none;
+  padding: 0;
+}
+
+.queue-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.song-info {
+  display: flex;
+  align-items: center;
+}
+
+.song-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.song-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.artist-name {
+  font-size: 12px;
+  color: #777;
+}
+
+.current-song-info {
+  display: flex;
+  align-items: center;
+}
+
+.current-song-info img {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.current-song-details .song-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.current-song-details .artist-name {
+  font-size: 14px;
+  color: #777;
+}
+
+.music-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.control-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Layer effect for both sections */
+.queue-section::before,
+.current-song-section::before {
+  content: '';
+  position: absolute;
+  top: -10px; /* Adjust to create a layered effect */
+  left: -10px; /* Adjust to create a layered effect */
+  right: -10px; /* Adjust to create a layered effect */
+  bottom: -10px; /* Adjust to create a layered effect */
+  background-color: rgba(255, 255, 255, 0.5); /* Slightly transparent white background */
+  border-radius: 15px; /* Match border radius */
+  z-index: -1; /* Place behind the content */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Layered shadow effect */
+}
