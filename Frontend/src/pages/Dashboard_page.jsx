@@ -56,13 +56,11 @@ const Dashboard = () => {
   }, [])
   
   useEffect(() => {
-    if(uri !== ''){
-  
+    if(uri !== ''){ 
     playSong(deviceId);
     }
     
   }, [uri])
-
 
     // Initialize Spotify Web Playback SDK
     useEffect(() => {
@@ -331,7 +329,7 @@ const fetchSongFeatures = async (trackId) => {
       <div className="dashboard-content">
         <div className="sidebar">
           <h1>Dashboard</h1>
-          <button className="sidebar-btn">Home</button>
+          <button className="sidebar-btn" >Home</button>
           <button className="sidebar-btn">Admin</button>
         </div>
 
