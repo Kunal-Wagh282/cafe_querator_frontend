@@ -357,22 +357,6 @@ const fetchSongFeatures = async (trackId) => {
               />
               <button type="submit">Search</button>
             </form>
-
-            {/* Display search results
-            {searchResults.length > 0 && (
-              <div className="search-results">
-                <h2>Search Results</h2>
-                <ul>
-                  {searchResults.map((track) => (
-                    <li key={track.id}>
-                      {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )} */}
-
-            {/* Display suggestions */}
         {suggestions.length > 0 && (
           <div className="suggestions">
             <ul>
