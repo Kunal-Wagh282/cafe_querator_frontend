@@ -181,7 +181,7 @@ const Dashboard = () => {
           'Authorization': `Bearer ${jwt}`,
         },
       });
-
+      console.log(response.data)
       const { cafe_info ,token_info } = response.data;
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
@@ -193,7 +193,7 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}, { withCredentials: true }); // Added withCredentials
+      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}); // Added withCredentials
       localStorage.removeItem("jwt");
       navigate('/'); // Redirect to home or login page
     } catch (error) {
