@@ -16,6 +16,16 @@ const Dashboard = () => {
   const [currentTrack, setCurrentTrack] = useState(null); // For currently playing track
   const [isPlaying, setIsPlaying] = useState(false); // Playback status
   const [player, setPlayer] = useState(null); // State for the Spotify Player
+  const [trackName, setTrackName] = useState('');
+  const [artistName, setArtistName] = useState('');
+  const [isPaused, setIsPaused] = useState(false);
+  const [deviceId, setDeviceId] = useState(null);
+  const [uri, setUri] = useState('');
+  const clientID = '44c18fde03114e6db92a1d4deafd6a43';
+  const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
+  const redirectUri = 'http://localhost:5173/dashboard';
+  //const YELLOW_TRACK_URI = 'spotify:track:3AJwUDP919kvQ9QcozQPxg'; // Spotify URI for "Yellow" by Coldplay
+
   const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
   const navigate = useNavigate();
 
@@ -41,18 +51,83 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    fetchCafeInfo();
-  
+    fetchCafeInfo();  
     
   }, [])
   
+  useEffect(() => {
+    if(uri !== ''){
+  
+    playSong(deviceId);
+    }
+    
+  }, [uri])
 
+
+    // Initialize Spotify Web Playback SDK
+    useEffect(() => {
+      if (accessToken) {
+        const script = document.createElement("script");
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
+        document.body.appendChild(script);
+  
+        window.onSpotifyWebPlaybackSDKReady = () => {
+          const spotifyPlayer = new window.Spotify.Player({
+            name: "Spotify Web Player",
+            getOAuthToken: cb => { cb(accessToken); },
+            volume: 1
+          });
+  
+          spotifyPlayer.addListener('ready', ({ device_id }) => {
+            console.log('Ready with Device ID', device_id);
+            setDeviceId(device_id);
+          });
+  
+          spotifyPlayer.addListener('player_state_changed', state => {
+            if (state) {
+              setTrackName(state.track_window.current_track.name);
+              setArtistName(state.track_window.current_track.artists.map(artist => artist.name).join(', '));
+              setIsPaused(state.paused);
+            }
+          });
+  
+          spotifyPlayer.connect();
+          setPlayer(spotifyPlayer);
+        };
+      }
+    }, [accessToken]);
+  
+
+    const playSong = (deviceId) => {
+      axios({
+        method: 'put',
+        url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          uris: [uri], // URI of the song to play
+        },
+      })
+        .then(() => {
+          console.log('Playing',trackName);
+        })
+        .catch((error) => {
+          console.error('Error playing the song:', error);
+        });
+    };
+
+    const handlePlayPause = () => {
+      player.togglePlay();
+    };
+
+    
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
-    const clientID = '44c18fde03114e6db92a1d4deafd6a43';
-    const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
-    const redirectUri = 'http://localhost:5173/dashboard';
+    
 
     try {
       const response = await axios.post('https://accounts.spotify.com/api/token', null, {
@@ -69,7 +144,7 @@ const Dashboard = () => {
       });
 
       const { access_token, refresh_token, expires_in } = response.data;
-
+      setAccessToken(access_token);
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
@@ -158,13 +233,17 @@ const fetchSongFeatures = async (trackId) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log("Features",response.data)
+    setUri(response.data.uri);
+
     return response.data; // Return song features
   } catch (error) {
     console.error('Error fetching song features:', error);
     return null; // Return null on error
   }
 };
+
+
+
 
   // Handle search form submission
   const handleSearchSubmit = async (e) => {
@@ -178,10 +257,26 @@ const fetchSongFeatures = async (trackId) => {
         
         // Fetch the song features
         const features = await fetchSongFeatures(trackId);
+
         
         if (features) {
           // Store the features (e.g., danceability, energy, etc.)
           setSongFeatures(features); // Assume you have a state to store features
+          console.log(features)
+          // try { 
+          //  const response=await axios.post('https://cafequerator-backend.onrender.com/managequeue/add-track', {
+          //       table_no : 0,
+          //       track_name : 'trackName',
+          //       track_id : trackId,
+          //       headers: {
+          //         'Authorization': `Bearer ${jwt}`,
+          //       },
+          //   }); 
+          //   console.log(response)
+          // } catch (error) {
+          //   console.error("Failed to log out. Please try again.");
+          // }
+
         }
       }
     }
@@ -221,51 +316,7 @@ const fetchSongFeatures = async (trackId) => {
   };
   
 
-  // Function to pause the song
-const pauseSong = () => {
-  if (audioRef.current) {
-    audioRef.current.pause(); // Pause the current audio
-    setIsPlaying(false); // Update playback status
-  }
-};
-
-// Function to resume playback
-const resumeSong = () => {
-  if (audioRef.current) {
-    audioRef.current.play(); // Resume playback
-    setIsPlaying(true); // Update playback status
-  }
-};
-
-// Function to skip to the next track (if you have a queue)
-const nextSong = () => {
-  const currentIndex = searchResults.findIndex(track => track.id === currentTrack.id);
-  const nextTrack = searchResults[(currentIndex + 1) % searchResults.length]; // Get the next song in the queue
   
-  playSong(nextTrack); // Play the next song
-};
-
-
-  // Function to play a selected song
-  const playSong = (track) => {
-    if (!player) return;
-
-    // Set the current track details
-    setCurrentTrack(track);
-    
-    // Use the Spotify player SDK to play the track
-    player.connect().then((success) => {
-      if (success) {
-        player.play({
-          uris: [track.uri], // Use the track URI to play
-        });
-        setIsPlaying(true); // Update playback status
-      }
-    });
-  };
-
-const audioRef = useRef(null);
-
 
 
   // Render the component
@@ -293,7 +344,7 @@ const audioRef = useRef(null);
           {/* Removed the error message and cafe information section */}
         </div>
 
-        <div className="queue-section">
+        <div className="queuee-section">
           <h2>Queue</h2>
           <div className="spotify-queue">
             <p>Spotify queue will display here</p>
@@ -339,11 +390,10 @@ const audioRef = useRef(null);
 
       <div className="music-player">
           <div className="player-bar">
-            <p>{currentTrack ? `${currentTrack.name} by ${currentTrack.artists.map(artist => artist.name).join(', ')}` : 'No song playing'}</p>
-            <button onClick={isPlaying ? pauseSong : resumeSong}>
-              {isPlaying ? 'Pause' : 'Play'}
-            </button>
-            <button onClick={nextSong}>Next</button>
+          <h3>Now Playing: {trackName} by {artistName}</h3>
+            <button onClick={handlePlayPause}>{isPaused ? 'Play' : 'Pause'}</button>
+
+            {/* {accessToken ? <WebPlayback token={accessToken} /> : <p>Loading Spotify Web Playback...</p>} */}
           </div>
         </div>
     </div>

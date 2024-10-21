@@ -7,6 +7,7 @@
   margin: 0; /* Remove auto margin for full coverage */
   box-sizing: border-box; /* Include padding in the element's total width and height */
   overflow-y: auto; /* Enable scrolling if content exceeds the viewport */
+  align-items: center;
 
 }
 
@@ -25,7 +26,7 @@
 
 .queue-section,
 .current-song-section {
-  background-color: #fff; /* White background for the sections */
+  background-color: white; /* White background for the sections */
   padding: 15px; /* Padding for the sections */
   border-radius: 10px; /* Rounded corners */
   margin-bottom: 20px; /* Space between sections */

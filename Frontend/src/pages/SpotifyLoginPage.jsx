@@ -7,7 +7,7 @@ const SpotifyLoginPage = () => {
   const REDIRECT_URI = "http://localhost:5173/dashboard"; // Redirect URI after Spotify login
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "code"; // Using authorization code flow
-  const SCOPE = "user-read-private user-read-email"; // Add necessary scopes
+  const SCOPE = "streaming user-read-email user-read-private user-library-read user-library-modify user-read-playback-state user-modify-playback-state"; // Add necessary scopes
   const navigate = useNavigate();
 
   // This effect can be removed since we're not handling any tokens here

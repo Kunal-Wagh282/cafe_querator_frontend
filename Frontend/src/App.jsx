@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard_page';
 import './App.css';
 import Table from './pages/Table';
 import Landing from './pages/Landing';
+
 function App() {
   return (
     <Router>
@@ -18,6 +19,7 @@ function App() {
         <Route path="/spotify-login" element={<SpotifyLoginPage />} /> {/* Spotify Login Page */}
         <Route path="/dashboard" element={<Dashboard />} /> 
         <Route path="/:cafename/table/:tableid" element={<Table/>} /> 
+
       </Routes>
     </Router>
   );
