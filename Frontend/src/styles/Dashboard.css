@@ -24,7 +24,7 @@
   margin: 0;
   font-size: 2rem;
   font-weight: bold;
-  align-items:left;
+  align-items: left;
 }
 
 .dashboard-header p {
@@ -32,7 +32,7 @@
   font-size: 1rem;
   color: #666; /* Customize the text color */
   text-align: left;
-  color : black ;
+  color: black;
 }
 
 /* Content section */
@@ -114,7 +114,6 @@
   color: #333; /* Customize text color */
 }
 
-
 /* Suggestions dropdown styling */
 .suggestions {
   border: 1px solid #ccc; /* Border to distinguish suggestions */
@@ -145,3 +144,20 @@
   background-color: #f0f0f0; /* Highlight suggestion on hover */
 }
 
+
+.set-vibe {
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for distinction */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  margin-bottom: 20px; /* Space below the section */
+}
+
+.set-vibe h2 {
+  margin-bottom: 10px;
+}
+
+.set-vibe select, .set-vibe button {
+  margin-top: 10px;
+  padding: 10px;
+}

@@ -193,6 +193,14 @@ const Dashboard = () => {
     try {
       await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}); // Added withCredentials
       localStorage.removeItem("jwt");
+      if(player)
+      {
+        setDeviceId(null);
+        setAccessToken("");
+        setIsPlaying(false);
+        setCurrentTrack(null);
+        player.disconnect();
+      }
       navigate('/'); // Redirect to home or login page
     } catch (error) {
       console.error("Failed to log out. Please try again.");
@@ -261,19 +269,6 @@ const fetchSongFeatures = async (trackId) => {
           // Store the features (e.g., danceability, energy, etc.)
           setSongFeatures(features); // Assume you have a state to store features
           console.log(features)
-          // try { 
-          //  const response=await axios.post('https://cafequerator-backend.onrender.com/managequeue/add-track', {
-          //       table_no : 0,
-          //       track_name : 'trackName',
-          //       track_id : trackId,
-          //       headers: {
-          //         'Authorization': `Bearer ${jwt}`,
-          //       },
-          //   }); 
-          //   console.log(response)
-          // } catch (error) {
-          //   console.error("Failed to log out. Please try again.");
-          // }
 
         }
       }
@@ -354,7 +349,7 @@ const fetchSongFeatures = async (trackId) => {
                 onChange={handleSearchInputChange}
               />
               <button type="submit">Search</button>
-            </form>
+            </form> 
         {suggestions.length > 0 && (
           <div className="suggestions">
             <ul>
