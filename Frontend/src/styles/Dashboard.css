@@ -1,147 +1,44 @@
-/* Container for the entire dashboard */
-.dashboard-container {
-  display: grid;
-  grid-template-rows: 10vh auto; /* 10vh for the header, rest for the content */
-  grid-template-columns: 1fr auto 1fr; /* Sidebar, main section, queue section */
-  height: 100vh; /* Full height of the viewport */
-  width: 100vw; /* Full width of the viewport */
-}
+<!-- Container for the entire dashboard -->
+<div class="grid grid-rows-[10vh_auto] grid-cols-[1fr_auto_1fr] h-screen w-screen">
+  <!-- Header section -->
+  <header class="col-span-full bg-[#6B7A40] flex justify-center items-center w-full h-[10vh] shadow-md">
+    <h1 class="m-0 text-2xl font-bold">Header Title</h1>
+    <p class="m-0 text-base text-black">Subtitle</p>
+  </header>
 
-/* Header section */
-.dashboard-header {
-  grid-column: 1 / -1; /* Span all columns to cover full width */
-  background-color: #6B7A40; /* Customize the background color */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%; /* Full width of the screen */
-  height: 10vh; /* 1/10th of the screen height */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
-}
+  <!-- Content section -->
+  <div class="col-span-full grid grid-cols-[200px_auto_200px] h-[calc(100vh-10vh)] bg-white">
+    <!-- Sidebar styling -->
+    <aside class="bg-[#F5F5DC] p-5 h-full flex flex-col items-start">
+      <button class="bg-[#D9D9D9] text-black p-2 mb-2 rounded cursor-pointer w-full text-center text-base hover:bg-[#0056b3]">Button 1</button>
+      <button class="bg-[#D9D9D9] text-black p-2 mb-2 rounded cursor-pointer w-full text-center text-base hover:bg-[#0056b3]">Button 2</button>
+      <!-- Add more sidebar buttons as needed -->
+    </aside>
 
-/* Header text styling */
-.dashboard-header h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: bold;
-  align-items:left;
-}
+    <!-- Main section styling -->
+    <main class="bg-[#F9F6F0] p-5 h-full rounded-lg shadow-md">
+      <!-- Main content goes here -->
+    </main>
 
-.dashboard-header p {
-  margin: 0;
-  font-size: 1rem;
-  color: #666; /* Customize the text color */
-  text-align: left;
-  color : black ;
-}
+    <!-- Queue section styling -->
+    <aside class="bg-[#F5F5DC] p-5 h-full flex flex-col rounded-lg shadow-md">
+      <!-- Queue content goes here -->
+    </aside>
+  </div>
 
-/* Content section */
-.dashboard-content {
-  grid-column: 1 / -1; /* Span all columns */
-  display: grid;
-  grid-template-columns: 200px auto 200px; /* Sidebar, main section, queue section */
-  height: calc(100vh - 10vh); /* Space between the header and music player */
-  background-color: #fff;
-}
+  <!-- Optional music player styling -->
+  <div class="fixed bottom-0 left-0 w-full h-[10vh] bg-[#F5F5DC] flex justify-center items-center shadow-md">
+    <div class="w-full text-center text-base text-[#333]">
+      <!-- Player controls go here -->
+    </div>
+  </div>
 
-/* Sidebar styling */
-.sidebar {
-  background-color: #F5F5DC;
-  padding: 20px;
-  height: 100%; /* Fill the full height of content area */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* Sidebar buttons */
-.sidebar-btn {
-  background-color: #D9D9D9;
-  color: black;
-  padding: 10px 20px;
-  margin-bottom: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  text-align: center;
-  font-size: 1rem;
-}
-
-.sidebar-btn:hover {
-  background-color: #0056b3;
-}
-
-/* Main section styling */
-.main-section {
-  background-color: #F9F6F0; /* Different background color for distinction */
-  padding: 20px; /* Add padding inside the main section */
-  height: 100%; /* Match the height of the sidebar */
-  border-radius: 8px; /* Rounded corners for visual distinction */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-
-/* Queue section styling */
-.queuee-section {
-  background-color: #F5F5DC; /* Different background color for distinction */
-  padding: 20px;
-  height: 100%; /* Fill the full height of the content area */
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px; /* Rounded corners for visual distinction */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-
-/* Optional music player styling */
-.music-player {
-  background-color: #F5F5DC;
-  position: fixed; /* Fix the player at the bottom of the screen */
-  bottom: 0; /* Align it to the bottom */
-  left: 0; /* Align it to the leftmost part of the screen */
-  width: 100%; /* Full width of the screen */
-  height: 10vh; /* Same height as the header */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for visual effect */
-}
-
-/* Player bar content (e.g., controls) */
-.player-bar {
-  width: 100%; /* Full width for content inside */
-  text-align: center; /* Center the content inside the player */
-  font-size: 1rem; /* Adjust font size for controls */
-  color: #333; /* Customize text color */
-}
-
-
-/* Suggestions dropdown styling */
-.suggestions {
-  border: 1px solid #ccc; /* Border to distinguish suggestions */
-  background-color: #fff; /* Background color for the dropdown */
-  position: absolute; /* Position it absolutely below the input */
-  z-index: 10; /* Ensure it appears above other elements */
-  width: 25vh; /* Match the width of the input */
-  margin-top: 5px; /* Space between input and dropdown */
-  border-radius: 4px; /* Rounded corners for the dropdown */
-  max-height: 200px; /* Limit the height */
-  overflow-y: auto; /* Enable scrolling for overflow */
-}
-
-/* Suggestions list styling */
-.suggestions ul {
-  list-style-type: none; /* Remove default list styles */
-  margin: 0;
-  padding: 0;
-}
-
-/* Individual suggestion item styling */
-.suggestions li {
-  padding: 10px; /* Add padding for clickable items */
-  cursor: pointer; /* Change cursor to pointer */
-}
-
-.suggestions li:hover {
-  background-color: #f0f0f0; /* Highlight suggestion on hover */
-}
-
+  <!-- Suggestions dropdown styling -->
+  <div class="absolute z-10 border border-gray-300 bg-white w-[25vh] mt-1 rounded-md max-h-52 overflow-y-auto">
+    <ul class="list-none m-0 p-0">
+      <li class="p-2 cursor-pointer hover:bg-gray-100">Suggestion 1</li>
+      <li class="p-2 cursor-pointer hover:bg-gray-100">Suggestion 2</li>
+      <!-- Add more suggestions as needed -->
+    </ul>
+  </div>
+</div>
