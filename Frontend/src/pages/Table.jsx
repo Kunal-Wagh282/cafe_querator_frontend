@@ -67,15 +67,16 @@ const Table = () => {
   const addTrack = async () => {
     try {
       console.log(songName,trackId,localStorage.getItem('cjwt'))
-      const response = await axios.post('https://cafequerator-backend.onrender.com/managequeue/add-track', {
-         track_name: "Jeene Laga Hoon",
-         track_id: "3t3wsY5IdLVzB9WidegJSU",
+      const response = await axios.get('https://cafequerator-backend.onrender.com/managequeue/next-track', {
+        // track_name: "Jeene Laga Hoon",
+        // track_id: "3t3wsY5IdLVzB9WidegJSU",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('cjwt') }`,
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+          'Content-Type': 'application/json',
         },
       });
 
-
+      console.log(response.data)
       if(response.status === 200){
 
       }
