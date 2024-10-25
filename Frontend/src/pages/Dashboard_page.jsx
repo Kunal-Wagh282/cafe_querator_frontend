@@ -21,11 +21,14 @@ const Dashboard = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [deviceId, setDeviceId] = useState(null);
   const [uri, setUri] = useState('');
+  const [playlistQuery, setPlaylistQuery] = useState(""); // For playlist search input
+  const [playlistSuggestions, setPlaylistSuggestions] = useState([]); // To hold live playlist suggestions
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null); // Selected playlist details
+  // const [selectedplaylistID, setSelectedPlaylistID] = usestate(null) ;
   const clientID = '44c18fde03114e6db92a1d4deafd6a43';
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
   const redirectUri = 'http://localhost:5173/dashboard';
-  //const YELLOW_TRACK_URI = 'spotify:track:3AJwUDP919kvQ9QcozQPxg'; // Spotify URI for "Yellow" by Coldplay
-
+  
   const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
   const navigate = useNavigate();
 
@@ -311,6 +314,65 @@ const fetchSongFeatures = async (trackId) => {
   };
   
 
+  // --------------------------------------------------------------------------------------------------------------------------------
+  const handlePlaylistSearchSubmit = async (e) => {
+    e.preventDefault();
+    if (playlistQuery) {
+      const results = await searchPlaylists(playlistQuery);
+      if (results.length > 0) {
+        setSelectedPlaylist(results[0]);
+
+      }
+    }
+  };
+  
+  const handlePlaylistInputChange = (e) => {
+    const value = e.target.value;
+    setPlaylistQuery(value);
+    fetchPlaylistSuggestions(value); // Fetch playlist suggestions based on input
+  };
+  
+  const handlePlaylistSuggestionClick = (playlist) => {
+    setPlaylistQuery(playlist.name);
+    setSelectedPlaylist(playlist);
+    setPlaylistSuggestions([]);
+  
+  };
+  
+  // function to search playlist 
+  const searchPlaylists = async (query) => {
+    if (!accessToken) return [];
+  
+    const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=playlist&limit=10`;
+  
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data.playlists.items;
+    } catch (error) {
+      console.error('Error searching for playlists:', error);
+      return [];
+    }
+  };
+
+
+  const fetchPlaylistSuggestions = async (query) => {
+    if (!query) {
+      setPlaylistSuggestions([]);
+      return;
+    }
+  
+    const results = await searchPlaylists(query);
+    setPlaylistSuggestions(results);
+  };
+  
+  // --------------------------------------------------------------------------------------------------------------------------------
+  // fetching hte features of the playlists 
+  
+  
   
 
 
@@ -328,6 +390,29 @@ const fetchSongFeatures = async (trackId) => {
           <h1>Dashboard</h1>
           <button className="sidebar-btn">Home</button>
           <button className="sidebar-btn">Admin</button>
+
+          <form onSubmit={handlePlaylistSearchSubmit}>
+            <input  
+            type = "text"
+            placeholder = "search your playlist"
+            value = {playlistQuery}
+            onChange = {handlePlaylistInputChange}
+            />
+          </form>
+
+            <button type = "submit">Search Playlist</button>
+            
+            {playlistSuggestions.length > 0 && (
+                <div className="playlist-suggestions">
+                  <ul>
+                    {playlistSuggestions.map((playlist) => (
+                      <li key={playlist.id} onClick={() => handlePlaylistSuggestionClick(playlist)}>
+                        {playlist.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
         </div>
 
         <div className="main-section">
