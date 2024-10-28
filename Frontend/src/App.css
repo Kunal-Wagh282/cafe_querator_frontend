@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* In your CSS file (e.g., App.css) */
+.spotify-gradient {
+    background: linear-gradient(90deg, #090808 0%, #090808 100%);
+}
+ /* #1DB954 0% */
