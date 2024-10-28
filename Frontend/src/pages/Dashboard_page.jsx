@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +41,8 @@ const Dashboard = () => {
     if (authorizationCode) {
       exchangeAuthorizationCode(authorizationCode)
         .then(({ accessToken, refreshToken, expiresAt }) => {
+          console.log('access',accessToken);
+          
           setAccessToken(accessToken); // Set access token
           return sendTokenToBackend(accessToken, refreshToken, expiresAt);
         })
@@ -379,7 +383,7 @@ const fetchSongFeatures = async (trackId) => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
-        <p><br /><br  /><br/>Let's change the vibe today!</p>
+        <p><br /><br  /><br/>Let s change the vibe today!</p>
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
       </header>
 
