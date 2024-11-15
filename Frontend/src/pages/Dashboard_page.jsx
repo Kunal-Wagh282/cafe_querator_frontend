@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
-import API_URL from '../config'; // Import the API URL
+import CONFIG from '../config'; // Import the API URL
 
 
 const Dashboard = () => {
@@ -157,7 +157,7 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      await axios.post(`${API_URL}/settoken`, 
+      await axios.post(`${CONFIG.API_URL}/settoken`, 
         {
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -178,7 +178,7 @@ const Dashboard = () => {
   // Function to fetch cafe info
   const fetchCafeInfo = async () => {
     try {
-      const response = await axios.get(`${API_URL}/login`, {
+      const response = await axios.get(`${CONFIG.API_URL}/login`, {
         headers: {
           'Authorization': `Bearer ${jwt}`,
         },
@@ -195,7 +195,7 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
-      await axios.post(`${API_URL}/logout`, {}); // Added withCredentials
+      await axios.post(`${CONFIG.API_URL}/logout`, {}); // Added withCredentials
       localStorage.removeItem("jwt");
       if(player)
       {
@@ -434,7 +434,7 @@ const fetchSongFeatures = async (trackId) => {
                 value={searchQuery}
                 onChange={handleSearchInputChange}
               />
-              <button type="submit">Search</button>
+              <button type="submit">Play</button>
             </form> 
         {suggestions.length > 0 && (
           <div className="suggestions">

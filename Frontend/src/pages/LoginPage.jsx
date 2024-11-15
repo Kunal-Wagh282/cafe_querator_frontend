@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/LoginPage.css';
 import cafeImage from '../images/LoginPage.png';
-import API_URL from '../config'; // Import the API URL
+import CONFIG from '../config'; // Import the API URL
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -19,7 +19,7 @@ const LoginPage = () => {
 
     try {
       // POST request to login and set the token, no need for Authorization header here
-      const postResponse = await axios.post(`${API_URL}/login`, {
+      const postResponse = await axios.post(`${CONFIG.API_URL}/login`, {
         email: username,
         password: password
       });
@@ -50,7 +50,7 @@ const LoginPage = () => {
 
   const accessTokenIsSet = async (jwt) => {
     try {
-      const response = await axios.get(`${API_URL}/login`, {
+      const response = await axios.get(`${CONFIG.API_URL}/login`, {
         headers: {
           'Authorization': `Bearer ${jwt}`,
         },

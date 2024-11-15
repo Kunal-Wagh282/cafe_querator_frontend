@@ -1,4 +1,8 @@
-// config.js
-const API_URL = 'https://cafequerator-backend.onrender.com/customer/api';
-
-export default API_URL;
+const CONFIG = {
+    API_URL: 'https://cafequerator-backend.onrender.com/api',
+    CUSTOMER_URL: 'https://cafequerator-backend.onrender.com/customer/api',
+    QUEUE_URL: 'https://cafequerator-backend.onrender.com/managequeue',
+  };
+  
+  export default CONFIG;
+  

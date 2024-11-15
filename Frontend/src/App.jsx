@@ -18,7 +18,7 @@ function App() {
         <Route path="/register" element={<RegistrationPage />} /> {/* Registration Page */}
         <Route path="/spotify-login" element={<SpotifyLoginPage />} /> {/* Spotify Login Page */}
         <Route path="/dashboard" element={<Dashboard />} /> 
-        <Route path="/:cafename/table/:tableid" element={<Table/>} /> 
+        <Route path="/:cafename/table/:tableid" element={<Table/>} /> {/* http://localhost:5173/B/table/9?id=36 */}
 
       </Routes>
     </Router>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Table.css'; // Ensure CSS for styling
-import API_URL from '../config'; // Import the API URL
+import CONFIG from '../config'; // Import the API URL
 
 const Table = () => {
   const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL  
@@ -33,8 +33,7 @@ const Table = () => {
 
   const fetchToken = async () => {
     try {
-      
-      const response = await axios.get(`${API_URL}/access-token`, {
+      const response = await axios.get(`${CONFIG.CUSTOMER_URL}/access-token`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
         },
@@ -51,7 +50,7 @@ const Table = () => {
 
   const setJwtToken = async () => {
     try {
-      const response = await axios.post('https://cafequerator-backend.onrender.com/customer/api/login', {
+      const response = await axios.post(`${CONFIG.CUSTOMER_URL}/login`, {
         cafeId: cafeid, // Correct way to send query parameters in GET request
         tableNum:tableid
       });
@@ -69,7 +68,7 @@ const Table = () => {
   const addTrack = async () => {
     try {
       console.log(songName,trackId,localStorage.getItem('cjwt'))
-      const response = await axios.post('https://cafequerator-backend.onrender.com/managequeue/add-track',
+      const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
         {
         track_name: songName,
         track_id: trackId
