@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/RegistrationPage.css'; 
 import registrationImage from '../images/RegistrationPage.png'; 
+import CONFIG from '../config'; // Import the API URL
 
 const RegistrationPage = () => {
   const [step, setStep] = useState(1);
@@ -54,7 +55,7 @@ const RegistrationPage = () => {
 
     try {
       // Send the user and cafe details to the backend
-      const response = await axios.post('https://cafequerator-backend.onrender.com/api/register', {
+      const response = await axios.post(`${CONFIG.API_URL}/register`, {
         email: username,  // Change 'username' to 'email'
         password,
         cafe_info: {

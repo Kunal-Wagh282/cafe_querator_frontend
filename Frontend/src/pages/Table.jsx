@@ -2,28 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Table.css'; // Ensure CSS for styling
+import CONFIG from '../config'; // Import the API URL
 
 const Table = () => {
-  const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL
-  const location = useLocation(); // Access the query parameters
-  const searchParams = new URLSearchParams(location.search); // Create a URLSearchParams object from the location search
-  const cafeId = searchParams.get('id'); // Extracts 'id' from the query string
+  const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL  
   const [cjwt, setCJwt] = useState('');
+  const [accessToken, setAccessToken] = useState(""); // For storing access token
+  const location = useLocation(); // To access query parameters
+  const [searchQuery, setSearchQuery] = useState(""); // For search input
+  const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
+  const [searchResults, setSearchResults] = useState([]); // To store search results
+  const [songName, setSongname] = useState(""); // For search input
+  const [trackId, setTrackid] = useState(""); // For search input
+  const [queue, setQueue] = useState([]);
+  // Use URLSearchParams to parse the query string
+  const searchParams = new URLSearchParams(location.search);
+  const cafeid = searchParams.get('id'); // Extract `code` query param
+
 
   useEffect(() => {
     // Fetch JWT token once the component mounts
-    setJwtToken(); // Call the token fetch function
-  }, [cafeId]); // Re-run if cafeId changes
-        
+    setJwtToken()
+    .then(() => {
+      fetchToken()}) // Call the token fetch function
+  }, [tableid]); // Re-run if cafeId changes
 
+  useEffect(() => {
+    fetchQueue();
+  }, []);
+  
+  
+    
   const fetchToken = async () => {
     try {
-      const response = await axios.get('https://cafequerator-backend.onrender.com/customer/api/getaccess', {
+      const response = await axios.get(`${CONFIG.CUSTOMER_URL}/access-token`, {
         headers: {
-          'Authorization': `Bearer ${cjwt}`,
+          'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
         },
       });
-  
+      if(response.status === 200){
+      setAccessToken(response.data.access_token);
+      console.log("Access Token Set!")
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -32,52 +52,215 @@ const Table = () => {
 
   const setJwtToken = async () => {
     try {
-      const response = await axios.get('https://cafequerator-backend.onrender.com/customer/api/login', {
-        cafeId: cafeId , // Correct way to send query parameters in GET request
+      const response = await axios.post(`${CONFIG.CUSTOMER_URL}/login`, {
+        cafeId: cafeid, // Correct way to send query parameters in GET request
+        tableNum:tableid
       });
 
       if (response.status === 200) {
         console.log(response.data);
-        localStorage.setItem('cjwt', response.data.jwt); // Store JWT in localStorage
-        setCJwt(response.data.jwt); // Store the JWT in state
+        localStorage.setItem('cjwt', response.data.cjwt); // Store JWT in localStorage
+        setCJwt(response.data.cjwt); // Store the JWT in state
       }
     } catch (error) {
       console.error('Error fetching JWT:', error);
     }
   };
 
+  const addTrack = async () => {
+    try {
+      console.log(songName,trackId,localStorage.getItem('cjwt'))
+      const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
+        {
+        track_name: songName,
+        track_id: trackId
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      if(response.status === 200){
+
+      }
+      if(response.status === 403)
+      {
+        console.log("Vibe does not match")
+      }
+    } catch (error) {
+      console.error('Error adding song:', error);
+    }
+  };
+
+
+
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    if (searchQuery) {
+      const results = await searchSongs(searchQuery);
+  
+      if (results.length > 0) {
+        const selectedTrack = results[0]; // Assuming the first result is what the user meant
+        const trackId = selectedTrack.id;
+        setSongname(selectedTrack.name);
+        setTrackid(selectedTrack.id);
+
+        // Fetch the song features
+        const features = await fetchSongFeatures(trackId);
+        if (features) {
+          // Store the features (e.g., danceability, energy, etc.)
+         // setSongFeatures(features); // Assume you have a state to store features
+        }
+      }
+    }
+  };
+
+  const handleSuggestionClick = (track) => {
+    // Set the input value to the selected track's name
+    setSearchQuery(track.name);
+  
+    // Clear the suggestions dropdown
+    setSuggestions([]);
+  
+    // Optionally, clear the search results if you are displaying them somewhere else
+    setSearchResults([]);
+
+  };
+
+  const fetchSongFeatures = async (trackId) => {
+    if (!accessToken) return null;
+  
+    const endpoint = `https://api.spotify.com/v1/audio-features/${trackId}`;
+  
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      // setUri(response.data.uri);
+  
+      return response.data; // Return song features
+    } catch (error) {
+      console.error('Error fetching song features:', error);
+      return null; // Return null on error
+    }
+  };
+  
+
+
+    // Handle search input change
+    const handleSearchInputChange = (e) => {
+      const value = e.target.value;
+      setSearchQuery(value);
+      fetchSuggestions(value); // Fetch suggestions based on input
+    };
+  
+
+    const fetchSuggestions = async (query) => {
+      if (!query) {
+        setSuggestions([]);
+        return;
+      }
+  
+      const results = await searchSongs(query); // Await results
+      setSuggestions(results); // Store search results as suggestions
+    };
+
+    const searchSongs = async (query) => {
+      if (!accessToken) return [];
+  
+      const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
+  
+      try {
+        const response = await axios.get(endpoint, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        console.log('Search Response:', response.data); // Log the response data
+        return response.data.tracks.items; // Return search results
+      } catch (error) {
+        console.error('Error searching for songs:', error);
+        return []; // Return an empty array on error
+      }
+    };
+
+
+    const fetchQueue = async () => {
+      try {
+        const response = await axios.get(`${CONFIG.QUEUE_URL}/get-queue`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
+          },
+        });
+        if (response.status === 200) {
+          //setQueue(response.data.Queue); // Assuming the backend response contains a 'queue' array
+          console.log('Queue fetched:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching queue:', error);
+      }
+    };
+    
+
+
   return (
     <div className="table-container">
       {/* Search Bar */}
       <div className="search-bar">
-        <input type="text" placeholder="Search" />
+      <form onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                placeholder="Search for a song..."
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+              />
+              <button type="submit">Search</button>
+            </form> 
       </div>
+      <button className="sidebar-btn" onClick={addTrack}>Add to Queue</button>
+      {suggestions.length > 0 && (
+          <div className="suggestions">
+            <ul>
+              {suggestions.map((track) => (
+                <li key={track.id} onClick={() => handleSuggestionClick(track)}>
+                  {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {/* Queue Section */}
-      <div className="queue-section">
-        <h3>Queue :</h3>
-        <ul className="queue-list">
-          <li>
-            <div className="song-info">
-              <img src="path/to/album-art.jpg" alt="Album Art" />
-              <div>
-                <p className="song-title">Feel Good</p>
-                <p className="artist-name">The Zaraz</p>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div className="song-info">
-              <img src="path/to/album-art.jpg" alt="Album Art" />
-              <div>
-                <p className="song-title">Picture (feat. Sheryl Crow)</p>
-                <p className="artist-name">Kid Rock, Sheryl Crow</p>
-              </div>
-            </div>
-          </li>
-          {/* Add more songs as needed */}
-        </ul>
-      </div>
+{/* Queue Section */}
+<div className="queue">
+  <h2 className="queue-header">Mock Queue</h2>
+  <ul className="queue-list">
+    {queue.length > 0 ? (
+      queue.map((track, index) => (
+        <li key={index} className="queue-item">
+          {/* Display song image */}
+          <img 
+            src="https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228" 
+            alt={track.track_name} 
+            className="track-image"
+          />
+          <div className="track-info">
+            {/* Display song name */}
+            <span className="track-name">{track.track_name}</span>
+          </div>
+        </li>
+      ))
+    ) : (
+      <p className="no-songs">No songs in the queue</p>
+    )}
+  </ul>
+</div>
+
+
+
+
 
       {/* Current Song Section */}
       <div className="current-song-section">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
+import CONFIG from '../config'; // Import the API URL
 
 
 const Dashboard = () => {
@@ -59,13 +60,11 @@ const Dashboard = () => {
   }, [])
   
   useEffect(() => {
-    if(uri !== ''){
-  
+    if(uri !== ''){ 
     playSong(deviceId);
     }
     
   }, [uri])
-
 
     // Initialize Spotify Web Playback SDK
     useEffect(() => {
@@ -77,7 +76,7 @@ const Dashboard = () => {
   
         window.onSpotifyWebPlaybackSDKReady = () => {
           const spotifyPlayer = new window.Spotify.Player({
-            name: "Spotify Web Player",
+            name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
             getOAuthToken: cb => { cb(accessToken); },
             volume: 1
           });
@@ -158,7 +157,7 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/settoken', 
+      await axios.post(`${CONFIG.API_URL}/settoken`, 
         {
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -179,7 +178,7 @@ const Dashboard = () => {
   // Function to fetch cafe info
   const fetchCafeInfo = async () => {
     try {
-      const response = await axios.get('https://cafequerator-backend.onrender.com/api/login', {
+      const response = await axios.get(`${CONFIG.API_URL}/login`, {
         headers: {
           'Authorization': `Bearer ${jwt}`,
         },
@@ -196,7 +195,7 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}); // Added withCredentials
+      await axios.post(`${CONFIG.API_URL}/logout`, {}); // Added withCredentials
       localStorage.removeItem("jwt");
       if(player)
       {
@@ -268,8 +267,6 @@ const fetchSongFeatures = async (trackId) => {
         
         // Fetch the song features
         const features = await fetchSongFeatures(trackId);
-
-        
         if (features) {
           // Store the features (e.g., danceability, energy, etc.)
           setSongFeatures(features); // Assume you have a state to store features
@@ -413,7 +410,7 @@ const fetchSongFeatures = async (trackId) => {
       <div className="dashboard-content">
         <div className="sidebar">
           <h1>Dashboard</h1>
-          <button className="sidebar-btn">Home</button>
+          <button className="sidebar-btn" >Home</button>
           <button className="sidebar-btn">Admin</button>
 
           <form onSubmit={handlePlaylistSearchSubmit}>
@@ -460,7 +457,7 @@ const fetchSongFeatures = async (trackId) => {
                 value={searchQuery}
                 onChange={handleSearchInputChange}
               />
-              <button type="submit">Search</button>
+              <button type="submit">Play</button>
             </form> 
         {suggestions.length > 0 && (
           <div className="suggestions">
