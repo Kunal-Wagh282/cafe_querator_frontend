@@ -29,7 +29,10 @@ const Dashboard = () => {
   const clientID = '44c18fde03114e6db92a1d4deafd6a43';
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
   const redirectUri = 'http://localhost:5173/dashboard';
-  
+  const [expiresAt, setExpiresAt] = useState('');
+  const [refreshToken, setRefreshToken] = localStorage.getItem("refresh_token");
+
+
   const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
   const navigate = useNavigate();
 
@@ -67,39 +70,86 @@ const Dashboard = () => {
   }, [uri])
 
     // Initialize Spotify Web Playback SDK
+    // useEffect(() => {
+    //   if (accessToken) {
+    //     const script = document.createElement("script");
+    //     script.src = "https://sdk.scdn.co/spotify-player.js";
+    //     script.async = true;
+    //     document.body.appendChild(script);
+  
+    //     window.onSpotifyWebPlaybackSDKReady = () => {
+    //       const spotifyPlayer = new window.Spotify.Player({
+    //         name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
+    //         getOAuthToken: cb => { cb(accessToken); },
+    //         volume: 1
+    //       });
+  
+    //       spotifyPlayer.addListener('ready', ({ device_id }) => {
+    //         console.log('Ready with Device ID', device_id);
+    //         setDeviceId(device_id);
+    //       });
+  
+    //       spotifyPlayer.addListener('player_state_changed', state => {
+    //         if (state) {
+    //           setTrackName(state.track_window.current_track.name);
+    //           setArtistName(state.track_window.current_track.artists.map(artist => artist.name).join(', '));
+    //           setIsPaused(state.paused);
+    //         }
+    //       });
+    //       spotifyPlayer.connect();
+    //       setPlayer(spotifyPlayer);
+    //     };
+    //   }
+    // }, [accessToken]);
+  
     useEffect(() => {
-      if (accessToken) {
-        const script = document.createElement("script");
-        script.src = "https://sdk.scdn.co/spotify-player.js";
-        script.async = true;
-        document.body.appendChild(script);
-  
-        window.onSpotifyWebPlaybackSDKReady = () => {
-          const spotifyPlayer = new window.Spotify.Player({
-            name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
-            getOAuthToken: cb => { cb(accessToken); },
-            volume: 1
-          });
-  
-          spotifyPlayer.addListener('ready', ({ device_id }) => {
-            console.log('Ready with Device ID', device_id);
-            setDeviceId(device_id);
-          });
-  
-          spotifyPlayer.addListener('player_state_changed', state => {
-            if (state) {
-              setTrackName(state.track_window.current_track.name);
-              setArtistName(state.track_window.current_track.artists.map(artist => artist.name).join(', '));
-              setIsPaused(state.paused);
-            }
-          });
-  
-          spotifyPlayer.connect();
-          setPlayer(spotifyPlayer);
-        };
+      const intervalId = setInterval(() => {
+        if (isAccessTokenExpired(expiresAt)) {
+          console.log("Access token is expired. Attempting to refresh...");
+          refreshAccessToken(); // Call a function to refresh the token
+        } else {
+          console.log("Access token is still valid.");
+        }
+      }, 5000); // Check every 5 seconds
+    
+      return () => clearInterval(intervalId); // Cleanup on unmount
+    }, [expiresAt]); // Dependency array ensures it runs whenever `expiresAt` changes
+
+
+    const isAccessTokenExpired = (expiresAt) => {
+      if (!expiresAt) {
+        return true; // If expiresAt is not set, consider it expired
       }
-    }, [accessToken]);
-  
+      const now = new Date();
+      
+      return new Date(expiresAt) <= now; // Compare with current time
+    };
+
+
+    const refreshAccessToken = async () => {
+      try {
+        const response = await axios.post('https://accounts.spotify.com/api/token', null, {
+          params: {
+            grant_type: 'refresh_token',
+            refresh_token: localStorage.getItem("refresh_token"), // Ensure refresh token is stored securely
+            client_id: clientID,
+            client_secret: clientSecret,
+          },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+        const { access_token, expires_in } = response.data;
+    setAccessToken(access_token);
+    const newExpiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
+    setExpiresAt(newExpiresAt); // Update the expiration time
+    console.log("Access token refreshed successfully.");
+
+    sendTokenToBackend(access_token, refreshToken, newExpiresAt);     
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+  }
+};
 
     const playSong = (deviceId) => {
       axios({
@@ -129,8 +179,6 @@ const Dashboard = () => {
 
   // Function to exchange authorization code for tokens
   const exchangeAuthorizationCode = async (code) => {
-    
-
     try {
       const response = await axios.post('https://accounts.spotify.com/api/token', null, {
         params: {
@@ -147,6 +195,8 @@ const Dashboard = () => {
 
       const { access_token, refresh_token, expires_in } = response.data;
       setAccessToken(access_token);
+      setRefreshToken(refresh_token)
+      localStorage.setItem("refresh_token",refresh_token)
       const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
       return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
     } catch (error) {
@@ -157,6 +207,7 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
+      console.log("To Backend")
       await axios.post(`${CONFIG.API_URL}/settoken`, 
         {
         access_token: accessToken,
@@ -187,6 +238,7 @@ const Dashboard = () => {
       const { cafe_info ,token_info } = response.data;
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
+      setExpiresAt(token_info.expires_at);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
