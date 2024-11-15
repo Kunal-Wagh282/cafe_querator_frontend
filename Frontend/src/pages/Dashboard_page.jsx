@@ -70,37 +70,37 @@ const Dashboard = () => {
   }, [uri])
 
     // Initialize Spotify Web Playback SDK
-    // useEffect(() => {
-    //   if (accessToken) {
-    //     const script = document.createElement("script");
-    //     script.src = "https://sdk.scdn.co/spotify-player.js";
-    //     script.async = true;
-    //     document.body.appendChild(script);
+    useEffect(() => {
+      if (accessToken) {
+        const script = document.createElement("script");
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
+        document.body.appendChild(script);
   
-    //     window.onSpotifyWebPlaybackSDKReady = () => {
-    //       const spotifyPlayer = new window.Spotify.Player({
-    //         name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
-    //         getOAuthToken: cb => { cb(accessToken); },
-    //         volume: 1
-    //       });
+        window.onSpotifyWebPlaybackSDKReady = () => {
+          const spotifyPlayer = new window.Spotify.Player({
+            name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
+            getOAuthToken: cb => { cb(accessToken); },
+            volume: 1
+          });
   
-    //       spotifyPlayer.addListener('ready', ({ device_id }) => {
-    //         console.log('Ready with Device ID', device_id);
-    //         setDeviceId(device_id);
-    //       });
+          spotifyPlayer.addListener('ready', ({ device_id }) => {
+            console.log('Ready with Device ID', device_id);
+            setDeviceId(device_id);
+          });
   
-    //       spotifyPlayer.addListener('player_state_changed', state => {
-    //         if (state) {
-    //           setTrackName(state.track_window.current_track.name);
-    //           setArtistName(state.track_window.current_track.artists.map(artist => artist.name).join(', '));
-    //           setIsPaused(state.paused);
-    //         }
-    //       });
-    //       spotifyPlayer.connect();
-    //       setPlayer(spotifyPlayer);
-    //     };
-    //   }
-    // }, [accessToken]);
+          spotifyPlayer.addListener('player_state_changed', state => {
+            if (state) {
+              setTrackName(state.track_window.current_track.name);
+              setArtistName(state.track_window.current_track.artists.map(artist => artist.name).join(', '));
+              setIsPaused(state.paused);
+            }
+          });
+          spotifyPlayer.connect();
+          setPlayer(spotifyPlayer);
+        };
+      }
+    }, [accessToken]);
   
     useEffect(() => {
       const intervalId = setInterval(() => {
