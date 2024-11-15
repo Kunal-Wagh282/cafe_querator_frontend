@@ -24,7 +24,7 @@ const Dashboard = () => {
   const [playlistQuery, setPlaylistQuery] = useState(""); // For playlist search input
   const [playlistSuggestions, setPlaylistSuggestions] = useState([]); // To hold live playlist suggestions
   const [selectedPlaylist, setSelectedPlaylist] = useState(null); // Selected playlist details
-  // const [selectedplaylistID, setSelectedPlaylistID] = usestate(null) ;
+  const [selectedplaylistID, setSelectedPlaylistID] = useState(null) ;
   const clientID = '44c18fde03114e6db92a1d4deafd6a43';
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
   const redirectUri = 'http://localhost:5173/dashboard';
@@ -332,10 +332,35 @@ const fetchSongFeatures = async (trackId) => {
     fetchPlaylistSuggestions(value); // Fetch playlist suggestions based on input
   };
   
-  const handlePlaylistSuggestionClick = (playlist) => {
+  const handlePlaylistSuggestionClick = async (playlist) => {
     setPlaylistQuery(playlist.name);
     setSelectedPlaylist(playlist);
+    setSelectedPlaylistID(playlist.id)
     setPlaylistSuggestions([]);
+    console.log("name : ",playlist.name,"id : ",playlist.id)
+
+    const playlistData = {
+      playlist_name: playlist.name,
+      playlist_id: playlist.id,
+     };
+
+     try {
+      // Call the POST API
+      const response = await axios.post('https://cafequerator-backend.onrender.com/api/setplaylistvector', playlistData,
+
+        {
+          headers: {
+            'Authorization': `Bearer ${jwt}`,
+            'Content-Type': 'application/json', // Specify content type
+          }
+        }
+      );
+      console.log('Playlist data sent successfully:', response.data);
+          } catch (error) {
+              console.error('Error sending playlist data to backend:', error);
+          }
+
+          console.log("name:", playlist.name, "id:", playlist.id);
   
   };
   
