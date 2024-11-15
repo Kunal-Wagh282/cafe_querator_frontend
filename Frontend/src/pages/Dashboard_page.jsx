@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
+import API_URL from '../config'; // Import the API URL
 
 
 const Dashboard = () => {
@@ -156,7 +157,7 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/settoken', 
+      await axios.post(`${API_URL}/settoken`, 
         {
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -177,7 +178,7 @@ const Dashboard = () => {
   // Function to fetch cafe info
   const fetchCafeInfo = async () => {
     try {
-      const response = await axios.get('https://cafequerator-backend.onrender.com/api/login', {
+      const response = await axios.get(`${API_URL}/login`, {
         headers: {
           'Authorization': `Bearer ${jwt}`,
         },
@@ -194,7 +195,7 @@ const Dashboard = () => {
   // Function to handle logout
   const handleLogout = async () => {
     try {
-      await axios.post('https://cafequerator-backend.onrender.com/api/logout', {}); // Added withCredentials
+      await axios.post(`${API_URL}/logout`, {}); // Added withCredentials
       localStorage.removeItem("jwt");
       if(player)
       {

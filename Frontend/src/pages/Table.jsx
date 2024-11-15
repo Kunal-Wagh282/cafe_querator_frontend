@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Table.css'; // Ensure CSS for styling
+import API_URL from '../config'; // Import the API URL
 
 const Table = () => {
   const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL  
@@ -32,7 +33,8 @@ const Table = () => {
 
   const fetchToken = async () => {
     try {
-      const response = await axios.get('https://cafequerator-backend.onrender.com/customer/api/access-token', {
+      
+      const response = await axios.get(`${API_URL}/access-token`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
         },
@@ -67,16 +69,18 @@ const Table = () => {
   const addTrack = async () => {
     try {
       console.log(songName,trackId,localStorage.getItem('cjwt'))
-      const response = await axios.get('https://cafequerator-backend.onrender.com/managequeue/next-track', {
-        // track_name: "Jeene Laga Hoon",
-        // track_id: "3t3wsY5IdLVzB9WidegJSU",
+      const response = await axios.post('https://cafequerator-backend.onrender.com/managequeue/add-track',
+        {
+        track_name: songName,
+        track_id: trackId
+      },
+      {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+          'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
           'Content-Type': 'application/json',
-        },
+        }
       });
 
-      console.log(response.data)
       if(response.status === 200){
 
       }
