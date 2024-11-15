@@ -14,7 +14,7 @@ const Table = () => {
   const [searchResults, setSearchResults] = useState([]); // To store search results
   const [songName, setSongname] = useState(""); // For search input
   const [trackId, setTrackid] = useState(""); // For search input
-
+  const [queue, setQueue] = useState([]);
   // Use URLSearchParams to parse the query string
   const searchParams = new URLSearchParams(location.search);
   const cafeid = searchParams.get('id'); // Extract `code` query param
@@ -27,10 +27,12 @@ const Table = () => {
       fetchToken()}) // Call the token fetch function
   }, [tableid]); // Re-run if cafeId changes
 
-
+  useEffect(() => {
+    fetchQueue();
+  }, []);
   
-        
-
+  
+    
   const fetchToken = async () => {
     try {
       const response = await axios.get(`${CONFIG.CUSTOMER_URL}/access-token`, {
@@ -79,9 +81,12 @@ const Table = () => {
           'Content-Type': 'application/json',
         }
       });
-
       if(response.status === 200){
 
+      }
+      if(response.status === 403)
+      {
+        console.log("Vibe does not match")
       }
     } catch (error) {
       console.error('Error adding song:', error);
@@ -106,7 +111,6 @@ const Table = () => {
         if (features) {
           // Store the features (e.g., danceability, energy, etc.)
          // setSongFeatures(features); // Assume you have a state to store features
-          console.log(features)
         }
       }
     }
@@ -184,6 +188,24 @@ const Table = () => {
     };
 
 
+    const fetchQueue = async () => {
+      try {
+        const response = await axios.get(`${CONFIG.QUEUE_URL}/get-queue`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
+          },
+        });
+        if (response.status === 200) {
+          //setQueue(response.data.Queue); // Assuming the backend response contains a 'queue' array
+          console.log('Queue fetched:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching queue:', error);
+      }
+    };
+    
+
+
   return (
     <div className="table-container">
       {/* Search Bar */}
@@ -210,31 +232,35 @@ const Table = () => {
             </ul>
           </div>
         )}
-      {/* Queue Section */}
-      <div className="queue-section">
-        <h3>Queue :</h3>
-        <ul className="queue-list">
-          <li>
-            <div className="song-info">
-              <img src="path/to/album-art.jpg" alt="Album Art" />
-              <div>
-                <p className="song-title">Feel Good</p>
-                <p className="artist-name">The Zaraz</p>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div className="song-info">
-              <img src="path/to/album-art.jpg" alt="Album Art" />
-              <div>
-                <p className="song-title">Picture (feat. Sheryl Crow)</p>
-                <p className="artist-name">Kid Rock, Sheryl Crow</p>
-              </div>
-            </div>
-          </li>
-          {/* Add more songs as needed */}
-        </ul>
-      </div>
+
+{/* Queue Section */}
+<div className="queue">
+  <h2 className="queue-header">Mock Queue</h2>
+  <ul className="queue-list">
+    {queue.length > 0 ? (
+      queue.map((track, index) => (
+        <li key={index} className="queue-item">
+          {/* Display song image */}
+          <img 
+            src="https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228" 
+            alt={track.track_name} 
+            className="track-image"
+          />
+          <div className="track-info">
+            {/* Display song name */}
+            <span className="track-name">{track.track_name}</span>
+          </div>
+        </li>
+      ))
+    ) : (
+      <p className="no-songs">No songs in the queue</p>
+    )}
+  </ul>
+</div>
+
+
+
+
 
       {/* Current Song Section */}
       <div className="current-song-section">

@@ -76,7 +76,7 @@ const Dashboard = () => {
   
         window.onSpotifyWebPlaybackSDKReady = () => {
           const spotifyPlayer = new window.Spotify.Player({
-            name: "Spotify Web Player",
+            name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
             getOAuthToken: cb => { cb(accessToken); },
             volume: 1
           });
@@ -267,8 +267,6 @@ const fetchSongFeatures = async (trackId) => {
         
         // Fetch the song features
         const features = await fetchSongFeatures(trackId);
-
-        
         if (features) {
           // Store the features (e.g., danceability, energy, etc.)
           setSongFeatures(features); // Assume you have a state to store features
