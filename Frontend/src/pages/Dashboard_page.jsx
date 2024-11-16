@@ -278,6 +278,7 @@ const Dashboard = () => {
     try {
       await axios.post(`${CONFIG.API_URL}/logout`, {}); // Added withCredentials
       localStorage.removeItem("jwt");
+      localStorage.removeItem("refresh_token");
       if(player)
       {
         setDeviceId(null);
