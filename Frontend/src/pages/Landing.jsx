@@ -11,7 +11,7 @@ const Landing = () => {
         if(jwt)
         {
         
-         navigate('/try')
+         navigate('/dashboard')
         }
         else{
             navigate('/login')

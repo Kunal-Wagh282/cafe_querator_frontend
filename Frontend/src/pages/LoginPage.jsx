@@ -32,7 +32,7 @@ const LoginPage = () => {
 
         const accesstokenIsValid = await accessTokenIsSet(postResponse.data.jwt); // Await token check
         if (accesstokenIsValid) {
-          navigate('/try');
+          navigate('/dashboard');
         } else {
           navigate('/spotify-login');
         }
