@@ -9,8 +9,7 @@ const Landing = () => {
     useEffect(() => {
         const jwt = localStorage.getItem("jwt");
         if(jwt)
-        {
-        
+        {    
          navigate('/dashboard')
         }
         else{
