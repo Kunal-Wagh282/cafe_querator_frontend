@@ -51,11 +51,10 @@ const Dashboard = () => {
 
   // Routing and Navigation
   const navigate = useNavigate();
+  const clientID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+  const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
 
   // Miscellaneous
-  const clientID = '44c18fde03114e6db92a1d4deafd6a43';
-  const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
-  // const redirectUri = 'https://cafe-querator.vercel.app/outh';
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -78,26 +77,10 @@ const Dashboard = () => {
     setRows(rows);
     }
   }, [totalTables]);
-  // Effect to handle fetching token and cafe info
-  // useEffect(() => {
-  //   const query = new URLSearchParams(window.location.search);
-  //   const authorizationCode = query.get('code');
-  //   if (authorizationCode) {
-  //     exchangeAuthorizationCode(authorizationCode)
-  //       .then(({ accessToken, refreshToken, expiresAt }) => {
-  //         setAccessToken(accessToken); // Set access token
-  //         return sendTokenToBackend(accessToken, refreshToken, expiresAt);
-  //       })
-  //       .then(() => {
-  //         fetchCafeInfo(); // Fetch cafe info
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error during authorization:', error);
-  //       });
 
-  //     window.history.replaceState({}, document.title, window.location.pathname);
-  //   }
-  // }, [navigate]);
+  
+
+
 
   const playNextSong = async () => {
     try {
@@ -173,20 +156,6 @@ const Dashboard = () => {
           localStorage.setItem("device_id",device_id)
         });
   
-        // spotifyPlayer.addListener('player_state_changed', state => {
-        //   if (state) {
-        //     setTrackName(state.track_window.current_track.name);
-        //     setArtistName(
-        //       state.track_window.current_track.artists.map(artist => artist.name).join(', ')
-        //     );
-        //     setIsPaused(state.paused);
-  
-        //     // Detect when a track has ended
-        //     if (state.track_window.previous_tracks.length >= 0 && state.paused && !state.loading) {
-        //       playNextSong(); // Call the next song API
-        //     }
-        //   }
-        // });
         spotifyPlayer.addListener('player_state_changed', state => {
           if (state) {
               setTrackName(state.track_window.current_track.name);
@@ -223,6 +192,8 @@ const Dashboard = () => {
               }, resumeTimeoutDelay);
           }
       });
+
+      
       
         spotifyPlayer.connect();
         setPlayer(spotifyPlayer);
@@ -308,33 +279,6 @@ const Dashboard = () => {
     player.togglePlay();
   };
 
-  // Function to exchange authorization code for tokens
-  // const exchangeAuthorizationCode = async (code) => {
-  //   try {
-  //     const response = await axios.post('https://accounts.spotify.com/api/token', null, {
-  //       params: {
-  //         grant_type: 'authorization_code',
-  //         code: code,
-  //         redirect_uri: redirectUri,
-  //         client_id: clientID,
-  //         client_secret: clientSecret,
-  //       },
-  //       headers: {
-  //         'Content-Type': 'application/x-www-form-urlencoded',
-  //       },
-  //     });
-
-  //     const { access_token, refresh_token, expires_in } = response.data;
-  //     setAccessToken(access_token);
-  //     setRefreshToken(refresh_token)
-  //     localStorage.setItem("refresh_token",refresh_token)
-  //     const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
-  //     return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
-  //   } catch (error) {
-  //     throw new Error('Error exchanging authorization code');
-  //   }
-  // };
-
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
@@ -351,6 +295,7 @@ const Dashboard = () => {
       }
     }
     ); // Added withCredentials
+    console.log("Token Sent to Backend")
     } catch (error) {
       throw new Error('Error sending token to backend');
     }
@@ -659,15 +604,6 @@ const playSong = async (track_id) => {
 
           return rows;
         };
-
-        //number of rows
-        // const rows = generateTableRows(totalTables); // Get rows of tables
-
-
-
-
-
-
 
   // Render the component
   return (

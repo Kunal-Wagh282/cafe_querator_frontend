@@ -16,16 +16,14 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       // POST request to login and set the token, no need for Authorization header here
       const postResponse = await axios.post(`${CONFIG.API_URL}/login`, {
         email: username,
         password: password
       });
-
-
-      if (postResponse.data && postResponse.data.message === 'token set') {
+      if (postResponse.data && postResponse.data.message === 'token set') 
+      {
         console.log('Login successful');
         localStorage.setItem('jwt', postResponse.data.jwt);  // Store the new token
         setJwt(postResponse.data.jwt);
@@ -37,7 +35,9 @@ const LoginPage = () => {
           navigate('/spotify-login');
         }
           
-      } else {
+      } 
+      else 
+      {
         alert('Invalid username or password');
       }
     } catch (error) {
