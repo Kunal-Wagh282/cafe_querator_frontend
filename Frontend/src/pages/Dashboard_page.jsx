@@ -10,7 +10,7 @@ const Dashboard = () => {
   // Authentication and Tokens
   const [accessToken, setAccessToken] = useState("");
   const [expiresAt, setExpiresAt] = useState('');
-  const [refreshToken, setRefreshToken] = localStorage.getItem("refresh_token");
+  const [refreshToken, setRefreshToken] = useState('');
   const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
 
   // Player and Track Info
@@ -265,6 +265,7 @@ const Dashboard = () => {
       });
       console.log(response.data)
       const { cafe_info ,token_info } = response.data;
+      localStorage.setItem("refresh_token",token_info.refresh_token)
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
       setExpiresAt(token_info.expires_at);
