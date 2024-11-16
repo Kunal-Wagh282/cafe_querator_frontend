@@ -96,9 +96,9 @@ const Dashboard = () => {
         },
       });
   
-      if (response.status === 200 && response.data.Queue) 
+      if (response.status === 200 && response.data.Next_track) 
       {
-        const data = response.data.Queue;
+        const data = response.data.Next_track;
         console.log(data.track_id);
   
         // Update the state with the next track details
@@ -612,7 +612,18 @@ const playSong = async (track_id) => {
         <div className="sidebar">
           <h1>Dashboard</h1>
           <button className="sidebar-btn" >Home</button>
-          <button className="sidebar-btn" onClick={playNextSong} disabled = {isButtonDisabled} > Start Vibe </button>
+          {/* <button className="sidebar-btn" onClick={playNextSong} disabled = {isButtonDisabled} > Start Vibe </button> */}
+          <button
+            className="sidebar-btn"
+            onClick={playNextSong}
+            disabled={isButtonDisabled}
+            style={{
+              backgroundColor: isButtonDisabled ? '#d3d3d3' : '#007bff', // Change color when disabled
+              color: isButtonDisabled ? '#a1a1a1' : '#fff', // Text color when disabled
+              cursor: isButtonDisabled ? 'not-allowed' : 'pointer', // Change cursor when disabled
+            }}>
+            Start Vibe
+          </button>
 
           <form onSubmit={handlePlaylistSearchSubmit}>
             <input  
