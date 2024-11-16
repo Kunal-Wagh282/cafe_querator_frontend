@@ -384,7 +384,6 @@ const fetchSongFeatures = async (trackId) => {
       setSuggestions([]);
       return;
     }
-
     const results = await searchSongs(query); // Await results
     setSuggestions(results); // Store search results as suggestions
   };

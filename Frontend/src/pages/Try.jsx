@@ -10,7 +10,7 @@ const Dashboard = () => {
   // Authentication and Tokens
   const [accessToken, setAccessToken] = useState("");
   const [expiresAt, setExpiresAt] = useState('');
-  const [refreshToken, setRefreshToken] = localStorage.getItem("refresh_token");
+  const [refreshToken, setRefreshToken] = useState('');
   const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
 
   // Player and Track Info
@@ -20,10 +20,14 @@ const Dashboard = () => {
   const [trackName, setTrackName] = useState('');
   const [artistName, setArtistName] = useState('');
   const [player, setPlayer] = useState(null);
-  const [deviceId, setDeviceId] = useState(null);
+  //const [deviceId, setDeviceId] = useState(null);
   const [uri, setUri] = useState('');
   const [trackId, setTrackid] = useState(""); // For search input
   const [songName, setSongname] = useState(""); // For search input
+  const [track_artist_name, setTrack_Artist_Name] = useState(""); // For search input
+  const [track_img_url, setTrack_Image_Url] = useState(""); // For search input
+
+
 
 
   // Search and Suggestions
@@ -59,11 +63,6 @@ const Dashboard = () => {
     fetchCafeInfo();
   }, []);
   
-  useEffect(() => {
-    if(uri !== ''){ 
-    playSong(deviceId);
-    }
-  }, [uri])
 
   // Effect to handle fetching token and cafe info
   useEffect(() => {
@@ -88,7 +87,6 @@ const Dashboard = () => {
 
   const playNextSong = async () => {
     try {
-    
       // Fetch the next track from the API
       const response = await axios.get(`${CONFIG.QUEUE_URL}/next-track`, {
         headers: {
@@ -96,60 +94,41 @@ const Dashboard = () => {
           "Content-Type": "application/json"
         },
       });
-
-      if (response.status === 200) {
-        // Play the next track
-        //playSong(deviceId); // Call your existing playSong function
-        
-        const trackName = extractTrackName(response.data.Queue);
-        const results = await searchSongs(trackName);
-        const selectedTrack = results[0]; // Assuming the first result is what the user meant
-        const trackId = selectedTrack.id;
-        setSongname(selectedTrack.name);
-        setTrackid(selectedTrack.id);
-        // Fetch the song features
-
-        try {
-            const response2 = axios.post(`${CONFIG.QUEUE_URL}/next-track` , {} ,
-                {
-                 headers: {
-                  "Authorization": `Bearer ${localStorage.getItem("jwt")}`, // Pass the access token if required
-                  "Content-Type": "application/json"
-                }
-                });
-        } catch (error) {
-            console.log(error)
+  
+      if (response.status === 200 && response.data.Queue) {
+        const data = response.data.Queue;
+        console.log(data.track_id);
+  
+        // Update the state with the next track details
+        setSongname(data.track_name);
+        setTrackid(data.track_id);
+        setTrack_Artist_Name(data.track_artist_name);
+        setTrack_Image_Url(data.track_img_url);
+  
+        // Fetch the queue to ensure it’s up to date
+        await fetchQueue(); 
+        // If needed, send a POST request to notify the backend that the track has been played
+        if (response.data.Queue.track_id === queue[0].track_id) {
+          try {
+            const postResponse = await axios.post(`${CONFIG.QUEUE_URL}/next-track`, {}, {
+              headers: {
+                "Authorization": `Bearer ${jwt}`, // Pass the access token if required
+                "Content-Type": "application/json"
+              },
+            });
+            console.log("Next Track Post Called");
+          } catch (error) {
+            console.error("Error removing track from queue:", error);
+          }
         }
-
-
-        const features = await fetchSongFeatures(trackId);
-
-        //const features = await fetchSongFeatures(trackId);
-      } else {
+        // Play the next track
+        playSong(data.track_id); // Call your existing playSong function
+      } 
+      else {
         console.log("No next track available.");
       }
     } catch (error) {
       console.error("Error fetching the next track:", error);
-    }
-  };
-
-
-  const extractTrackName = (data) => {
-    try {
-      // Step 1: Replace single quotes with double quotes to make it JSON-compatible
-      const jsonCompatibleString = data.replace(/'/g, '"');
-      
-      // Step 2: Remove unsupported datetime parts
-      const cleanedString = jsonCompatibleString.replace(/datetime\.datetime\([^)]+\)/g, '"timestamp_placeholder"');
-      
-      // Step 3: Parse as JSON
-      const parsedData = JSON.parse(cleanedString);
-      
-      // Step 4: Extract and return track_name
-      return parsedData.track_name || "Unknown";
-    } catch (error) {
-      console.error("Error parsing string:", error);
-      return "Error parsing track name";
     }
   };
   
@@ -170,7 +149,8 @@ const Dashboard = () => {
   
         spotifyPlayer.addListener('ready', ({ device_id }) => {
           console.log('Ready with Device ID', device_id);
-          setDeviceId(device_id);
+          //setDeviceId(device_id);
+          localStorage.setItem("device_id",device_id)
         });
   
         spotifyPlayer.addListener('player_state_changed', state => {
@@ -184,7 +164,6 @@ const Dashboard = () => {
             // Detect when a track has ended
             if (state.track_window.previous_tracks.length > 0 && state.paused && !state.loading) {
               playNextSong(); // Call the next song API
-
             }
           }
         });
@@ -193,7 +172,7 @@ const Dashboard = () => {
         setPlayer(spotifyPlayer);
       };
     }
-  }, [accessToken, uri]);
+  }, [accessToken]);
   
 
   useEffect(() => {
@@ -262,25 +241,7 @@ const Dashboard = () => {
     }
   };
 
-  const playSong = (deviceId) => {
-    axios({
-      method: 'put',
-      url: `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      data: {
-        uris: [uri], // URI of the song to play
-      },
-    })
-      .then(() => {
-        console.log('Playing',uri);
-      })
-      .catch((error) => {
-        console.error('Error playing the song:', error);
-      });
-  };
+  
 
   const handlePlayPause = () => {
     player.togglePlay();
@@ -344,6 +305,7 @@ const Dashboard = () => {
       });
       console.log(response.data)
       const { cafe_info ,token_info } = response.data;
+      localStorage.setItem("refresh_token",token_info.refresh_token);
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
       setExpiresAt(token_info.expires_at);
@@ -357,9 +319,12 @@ const Dashboard = () => {
     try {
       await axios.post(`${CONFIG.API_URL}/logout`, {}); // Added withCredentials
       localStorage.removeItem("jwt");
+      localStorage.removeItem("refresh_token");
+
       if(player)
       {
-        setDeviceId(null);
+        //setDeviceId(null);
+        localStorage.removeItem("device_id");
         setAccessToken("");
         setIsPlaying(false);
         setCurrentTrack(null);
@@ -390,24 +355,47 @@ const Dashboard = () => {
   };
 
 // Function to fetch song features by track ID
-const fetchSongFeatures = async (trackId) => {
+const playSong = async (track_id) => {
   if (!accessToken) return null;
 
-  const endpoint = `https://api.spotify.com/v1/audio-features/${trackId}`;
+  const endpoint = `https://api.spotify.com/v1/audio-features/${track_id}`;
   try {
+    // Fetch song audio features
     const response = await axios.get(endpoint, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    setUri(response.data.uri);
-    return response.data; // Return song features
+
+    const songUri = response.data.uri; // Get the song URI from the response
+    const deviceId=localStorage.getItem("device_id");
+    // Play the song using the URI
+    await axios.put(
+      `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+      {
+        uris: [songUri], // URI of the song to play
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('Playing song with URI:', songUri);
 
   } catch (error) {
-    console.error('Error fetching song features:', error);
+    console.error('Error fetching song features or playing the song:', error);
     return null; // Return null on error
   }
 };
+
+
+
+
+
+
 
   // Handle search form submission
   const handleSearchSubmit = async (e) => {
@@ -416,11 +404,12 @@ const fetchSongFeatures = async (trackId) => {
       const results = await searchSongs(searchQuery);
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
-        const trackId = selectedTrack.id;
         setSongname(selectedTrack.name);
         setTrackid(selectedTrack.id);
+
         // Fetch the song features
-        const features = await fetchSongFeatures(trackId);
+        //const features = await fetchSongFeatures(trackId);
+        playSong(selectedTrack.id);
         try {
           const response = await axios.post(
             `${CONFIG.QUEUE_URL}/add-track`,
@@ -690,12 +679,12 @@ const fetchSongFeatures = async (trackId) => {
           <h3>Now Playing</h3>
           <div className="current-song-info">
             {/* Display the album art dynamically */}
-            <img src={queue[0]?.track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+            <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
             <div className="current-song-details">
               {/* Display the current song name dynamically */}
-              <p className="song-title">{queue[0]?.track_name || 'Song Title'}</p>
+              <p className="song-title">{songName || 'Song Title'}</p>
               {/* Display the artist name dynamically */}
-              <p className="artist-name">{queue[0]?.track_artist_name || 'Artist Name'}</p>
+              <p className="artist-name">{track_artist_name || 'Artist Name'}</p>
               <button onClick={handlePlayPause}>{isPaused ? 'Play' : 'Pause'}</button>
             </div>
             
