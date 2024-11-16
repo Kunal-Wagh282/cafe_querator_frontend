@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Table.css'; // Ensure CSS for styling
 import CONFIG from '../config'; // Import the API URL
+import Navbar from '../components/Navbar'; // Import the Navbar component
 
 const Table = () => {
   const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL  
@@ -64,55 +65,6 @@ const Table = () => {
       }
     } catch (error) {
       console.error('Error fetching JWT:', error);
-    }
-  };
-
-  const addTrack = async () => {
-    try {
-      console.log(songName,trackId,localStorage.getItem('cjwt'))
-      const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
-        {
-        track_name: songName,
-        track_id: trackId
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
-          'Content-Type': 'application/json',
-        }
-      });
-      if(response.status === 200){
-
-      }
-      if(response.status === 403)
-      {
-        console.log("Vibe does not match")
-      }
-    } catch (error) {
-      console.error('Error adding song:', error);
-    }
-  };
-
-
-
-  const handleSearchSubmit = async (e) => {
-    e.preventDefault();
-    if (searchQuery) {
-      const results = await searchSongs(searchQuery);
-  
-      if (results.length > 0) {
-        const selectedTrack = results[0]; // Assuming the first result is what the user meant
-        const trackId = selectedTrack.id;
-        setSongname(selectedTrack.name);
-        setTrackid(selectedTrack.id);
-
-        // Fetch the song features
-        const features = await fetchSongFeatures(trackId);
-        if (features) {
-          // Store the features (e.g., danceability, energy, etc.)
-         // setSongFeatures(features); // Assume you have a state to store features
-        }
-      }
     }
   };
 
@@ -196,11 +148,46 @@ const Table = () => {
           },
         });
         if (response.status === 200) {
-          //setQueue(response.data.Queue); // Assuming the backend response contains a 'queue' array
+          setQueue(response.data.Queue); // Assuming the backend response contains a 'queue' array
           console.log('Queue fetched:', response.data);
         }
       } catch (error) {
         console.error('Error fetching queue:', error);
+      }
+    };
+
+
+
+    const addTrack = async () => {
+      try {
+        const results = await searchSongs(searchQuery);
+        if (results.length > 0) {
+          const selectedTrack = results[0];
+          setSongname(selectedTrack.name);
+          setTrackid(selectedTrack.id);
+          const response = await axios.post(
+            `${CONFIG.QUEUE_URL}/add-track`,
+            {
+              track_name: selectedTrack.name,
+              track_id: selectedTrack.id,
+              track_artist_name: selectedTrack.artists[0]?.name || 'Unknown Artist',
+              track_img_url: selectedTrack.album?.images[0]?.url || 'https://placeholder.com/150',
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('cjwt')}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          if (response.status === 200) {
+            fetchQueue(); // Refresh queue
+            setSearchQuery('');
+
+          }
+        }
+      } catch (error) {
+        console.error('Error adding song:', error);
       }
     };
     
@@ -208,47 +195,60 @@ const Table = () => {
 
   return (
     <div className="table-container">
+    <Navbar cafeName={cafename}/>
       {/* Search Bar */}
+      
       <div className="search-bar">
-      <form onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                placeholder="Search for a song..."
-                value={searchQuery}
-                onChange={handleSearchInputChange}
-              />
-              <button type="submit">Search</button>
-            </form> 
+        <input
+          type="text"
+          placeholder="Search for a song..."
+          value={searchQuery}
+          onChange={handleSearchInputChange}
+        />
+        <button className="sidebar-btn" onClick={addTrack}>
+          Add Song to Queue
+        </button>
       </div>
-      <button className="sidebar-btn" onClick={addTrack}>Add to Queue</button>
+      
       {suggestions.length > 0 && (
-          <div className="suggestions">
-            <ul>
-              {suggestions.map((track) => (
-                <li key={track.id} onClick={() => handleSuggestionClick(track)}>
-                  {track.name} by {track.artists.map((artist) => artist.name).join(', ')}
-                </li>
-              ))}
-            </ul>
+  <div className="suggestions">
+    <ul>
+      {suggestions.map((track) => (
+        <li key={track.id} onClick={() => handleSuggestionClick(track)} className="suggestion-item">
+          <img 
+            src={track.album?.images[0]?.url || 'https://placeholder.com/150'} // Display album image
+            alt={track.name}
+            className="suggestion-image"
+          />
+          <div className="suggestion-text">
+            <span className="track-name">{track.name}</span>
+            <span className="artist-name">{track.artists.map((artist) => artist.name).join(', ')}</span>
           </div>
-        )}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
 
 {/* Queue Section */}
 <div className="queue">
-  <h2 className="queue-header">Mock Queue</h2>
+  <h2 className="queue-header">Ongoing Queue</h2>
   <ul className="queue-list">
     {queue.length > 0 ? (
       queue.map((track, index) => (
         <li key={index} className="queue-item">
-          {/* Display song image */}
+          {/* Display song image dynamically */}
           <img 
-            src="https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228" 
-            alt={track.track_name} 
+            src={track.track_img_url || 'https://placeholder.com/150'} // Use dynamic image URL
+            alt={track.track_name}
             className="track-image"
           />
           <div className="track-info">
-            {/* Display song name */}
+            {/* Display song name dynamically */}
             <span className="track-name">{track.track_name}</span>
+            {/* Display artist name dynamically */}
+            <span className="artist-name">{track.track_artist_name}</span>
           </div>
         </li>
       ))
@@ -258,27 +258,22 @@ const Table = () => {
   </ul>
 </div>
 
-
-
-
-
       {/* Current Song Section */}
-      <div className="current-song-section">
-        <h3>Current song :</h3>
-        <div className="current-song-info">
-          <img src="path/to/album-art.jpg" alt="Album Art" />
-          <div className="current-song-details">
-            <p className="song-title">Tera Ban Jaunga</p>
-            <p className="artist-name">Darshan Raval</p>
-          </div>
-        </div>
-        <div className="music-controls">
-          <button className="control-button">⏮</button>
-          <button className="control-button">⏯</button>
-          <button className="control-button">⏭</button>
-        </div>
+  <div className="current-song-section">
+    <h3>Now Playing</h3>
+    <div className="current-song-info">
+      {/* Display the album art dynamically */}
+      <img src={queue[0]?.track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+      <div className="current-song-details">
+        {/* Display the current song name dynamically */}
+        <p className="song-title">{queue[0]?.track_name || 'Song Title'}</p>
+        {/* Display the artist name dynamically */}
+        <p className="artist-name">{queue[0]?.track_artist_name || 'Artist Name'}</p>
       </div>
-    </div>
+      </div>
+  </div>
+</div>
+
   );
 };
 

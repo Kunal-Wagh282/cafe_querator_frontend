@@ -1,0 +1,25 @@
+.navbar {
+  background-color: #282828; /* Dark background color */
+  padding: 15px 30px; /* Padding for spacing */
+  display: flex;
+  justify-content: center; /* Space between logo and links */
+  align-items: center; /* Vertically center the items */
+  color: white;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  width: 100%; /* Ensure it takes the full width of the screen */
+  position: fixed; /* Fix the navbar at the top of the screen */
+  top: 0; /* Position it at the very top */
+  left: 0; /* Align to the left edge of the screen */
+  z-index: 1000; /* Ensure it appears on top of other content */
+}
+
+/* Navbar Title */
+.navbar .title {
+  font-size: 24px; /* Font size for the title */
+  font-weight: bold; /* Bold text */
+  letter-spacing: 1px; /* Letter spacing for a clean look */
+  color: #fff; /* White color for text */
+  align-items: center; /* Vertically center the items */
+
+}

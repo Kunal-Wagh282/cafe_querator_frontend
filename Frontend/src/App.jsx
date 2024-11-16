@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard_page';
 import './App.css';
 import Table from './pages/Table';
 import Landing from './pages/Landing';
-
+import Try from './pages/Try';
 function App() {
   return (
     <Router>
@@ -19,6 +19,8 @@ function App() {
         <Route path="/spotify-login" element={<SpotifyLoginPage />} /> {/* Spotify Login Page */}
         <Route path="/dashboard" element={<Dashboard />} /> 
         <Route path="/:cafename/table/:tableid" element={<Table/>} /> {/* http://localhost:5173/B/table/9?id=36 */}
+        <Route path="/try" element={<Try />} /> 
+
 
       </Routes>
     </Router>

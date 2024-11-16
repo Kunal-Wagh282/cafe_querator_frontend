@@ -53,6 +53,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchQueue();
+  }, []);
+
+  useEffect(() => {
     fetchCafeInfo();
   }, []);
   
@@ -83,38 +86,115 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-    // Initialize Spotify Web Playback SDK
+  const playNextSong = async () => {
+    try {
+    
+      // Fetch the next track from the API
+      const response = await axios.get(`${CONFIG.QUEUE_URL}/next-track`, {
+        headers: {
+          "Authorization": `Bearer ${jwt}`, // Pass the access token if required
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (response.status === 200) {
+        // Play the next track
+        //playSong(deviceId); // Call your existing playSong function
+        
+        const trackName = extractTrackName(response.data.Queue);
+        const results = await searchSongs(trackName);
+        const selectedTrack = results[0]; // Assuming the first result is what the user meant
+        const trackId = selectedTrack.id;
+        setSongname(selectedTrack.name);
+        setTrackid(selectedTrack.id);
+        // Fetch the song features
+
+        try {
+            const response2 = axios.post(`${CONFIG.QUEUE_URL}/next-track` , {} ,
+                {
+                 headers: {
+                  "Authorization": `Bearer ${localStorage.getItem("jwt")}`, // Pass the access token if required
+                  "Content-Type": "application/json"
+                }
+                });
+        } catch (error) {
+            console.log(error)
+        }
+
+
+        const features = await fetchSongFeatures(trackId);
+
+        //const features = await fetchSongFeatures(trackId);
+      } else {
+        console.log("No next track available.");
+      }
+    } catch (error) {
+      console.error("Error fetching the next track:", error);
+    }
+  };
+
+
+  const extractTrackName = (data) => {
+    try {
+      // Step 1: Replace single quotes with double quotes to make it JSON-compatible
+      const jsonCompatibleString = data.replace(/'/g, '"');
+      
+      // Step 2: Remove unsupported datetime parts
+      const cleanedString = jsonCompatibleString.replace(/datetime\.datetime\([^)]+\)/g, '"timestamp_placeholder"');
+      
+      // Step 3: Parse as JSON
+      const parsedData = JSON.parse(cleanedString);
+      
+      // Step 4: Extract and return track_name
+      return parsedData.track_name || "Unknown";
+    } catch (error) {
+      console.error("Error parsing string:", error);
+      return "Error parsing track name";
+    }
+  };
+  
+  // Player event listener
   useEffect(() => {
     if (accessToken) {
       const script = document.createElement("script");
       script.src = "https://sdk.scdn.co/spotify-player.js";
       script.async = true;
       document.body.appendChild(script);
-
+  
       window.onSpotifyWebPlaybackSDKReady = () => {
         const spotifyPlayer = new window.Spotify.Player({
-          name: `Spotify Web Player of cafe ${cafeInfo.Cafe_Name}`,
+          name: `Spotify Web Player of cafe ${cafeInfo?.Cafe_Name || "Unknown Cafe"}`,
           getOAuthToken: cb => { cb(accessToken); },
           volume: 1
         });
-
+  
         spotifyPlayer.addListener('ready', ({ device_id }) => {
           console.log('Ready with Device ID', device_id);
           setDeviceId(device_id);
         });
-
+  
         spotifyPlayer.addListener('player_state_changed', state => {
           if (state) {
             setTrackName(state.track_window.current_track.name);
-            setArtistName(state.track_window.current_track.artists.map(artist => artist.name).join(', '));
+            setArtistName(
+              state.track_window.current_track.artists.map(artist => artist.name).join(', ')
+            );
             setIsPaused(state.paused);
+  
+            // Detect when a track has ended
+            if (state.track_window.previous_tracks.length > 0 && state.paused && !state.loading) {
+              playNextSong(); // Call the next song API
+
+            }
           }
         });
+  
         spotifyPlayer.connect();
         setPlayer(spotifyPlayer);
       };
     }
-  }, [accessToken]);
+  }, [accessToken, uri]);
+  
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -195,7 +275,7 @@ const Dashboard = () => {
       },
     })
       .then(() => {
-        console.log('Playing',trackName);
+        console.log('Playing',uri);
       })
       .catch((error) => {
         console.error('Error playing the song:', error);
@@ -236,7 +316,6 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
-      console.log("To Backend")
       await axios.post(`${CONFIG.API_URL}/settoken`, 
         {
         access_token: accessToken,
@@ -303,7 +382,6 @@ const Dashboard = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log('Search Response:', response.data); // Log the response data
       return response.data.tracks.items; // Return search results
     } catch (error) {
       console.error('Error searching for songs:', error);
@@ -336,7 +414,6 @@ const fetchSongFeatures = async (trackId) => {
     e.preventDefault();
     if (searchQuery) {
       const results = await searchSongs(searchQuery);
-  
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
         const trackId = selectedTrack.id;
@@ -503,7 +580,7 @@ const fetchSongFeatures = async (trackId) => {
         <div className="sidebar">
           <h1>Dashboard</h1>
           <button className="sidebar-btn" >Home</button>
-          <button className="sidebar-btn">Admin</button>
+          <button className="sidebar-btn" onClick={playNextSong}>Admin</button>
 
           <form onSubmit={handlePlaylistSearchSubmit}>
             <input  
