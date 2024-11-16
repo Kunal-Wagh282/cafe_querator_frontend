@@ -28,6 +28,9 @@ const Dashboard = () => {
   const [track_img_url, setTrack_Image_Url] = useState(""); // For search input
 
 
+  // table number const
+  const [totalTables, setTotalTables ]= useState("") ; // You can change this value dynamically if needed
+  const [rows, setRows ]= useState([]) ; // You can change this value dynamically if needed
 
 
   // Search and Suggestions
@@ -54,7 +57,7 @@ const Dashboard = () => {
   // Miscellaneous
   const clientID = '44c18fde03114e6db92a1d4deafd6a43';
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
-  const redirectUri = 'https://cafe-querator.vercel.app/outh';
+  const redirectUri = 'http://localhost:5173/outh';
 
 
   const [loading, setLoading] = useState(true);
@@ -73,7 +76,12 @@ const Dashboard = () => {
     fetchCafeInfo();
   }, []);
   
-
+  useEffect(() => {
+    if(totalTables){
+    const rows= generateTableRows(totalTables)// Get rows of tables
+    setRows(rows);
+    }
+  }, [totalTables]);
   // Effect to handle fetching token and cafe info
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
@@ -90,7 +98,6 @@ const Dashboard = () => {
         .catch((error) => {
           console.error('Error during authorization:', error);
         });
-
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [navigate]);
@@ -363,6 +370,7 @@ const Dashboard = () => {
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
       setExpiresAt(token_info.expires_at);
+      setTotalTables(cafe_info.No_of_Tables)
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -610,18 +618,55 @@ const playSong = async (track_id) => {
   // get qr function 
   const getQRcode = async () => {
     try {
-      const response = await axios.post(`${CONFIG.API_URL}/genpdf`,{}, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-        },
-      });
-      if (response.status === 200) {
-        console.log('QR Generated');
-      }
+      const response = await axios.post(
+        'https://cafequerator-backend.onrender.com/api/genpdf', 
+        {}, 
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}` , // Replace with your JWT token
+          },
+          responseType: 'blob', // Important for handling binary data
+        }
+      );
+  
+      // Create a Blob from the PDF Stream
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+  
+      // Create a link element
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'generated_qr_codes.pdf'; // Name of the file
+      link.click(); // Trigger download
+  
+      // Clean up
+      window.URL.revokeObjectURL(link.href);
     } catch (error) {
-      console.error('Error in generating QR', error);
+      console.error('Error downloading the PDF:',error);
     }
+  
   };
+
+
+        // Function to generate table rows dynamically
+        const generateTableRows = (numberOfTables) => {
+          const tables = Array.from({ length: numberOfTables }, (_, index) => index + 1);
+          const rows = [];
+
+          // Split the tables into rows of 7
+          for (let i = 0; i < tables.length; i += 7) {
+            rows.push(tables.slice(i, i + 7)); // Create a row with up to 7 tables
+          }
+
+          return rows;
+        };
+
+        //number of rows
+        // const rows = generateTableRows(totalTables); // Get rows of tables
+
+
+
+
+
 
 
   // Render the component
@@ -641,7 +686,6 @@ const playSong = async (track_id) => {
         <div className="sidebar">
           <h1>Dashboard</h1>
           <button className="sidebar-btn" >Home</button>
-          {/* <button className="sidebar-btn" onClick={playNextSong} disabled = {isButtonDisabled} > Start Vibe </button> */}
           <button
             className="sidebar-btn"
             onClick={playNextSong}
@@ -678,8 +722,20 @@ const playSong = async (track_id) => {
                 </div>
               )}
         </div>
-
-      <div className="main-section">
+       
+        <div className="main-section">
+          <div className="table-status">
+            {/* Render the rows of tables */}
+            {rows.map((row, rowIndex) => (
+              <div key={rowIndex} className="table-row">
+                {row.map((table) => (
+                  <div key={table} className="table-square">
+                    {table}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="queue-section">

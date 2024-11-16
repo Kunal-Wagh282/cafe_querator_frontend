@@ -161,3 +161,35 @@
   margin-top: 10px;
   padding: 10px;
 }
+
+/* .table-status {
+  width : 800px;
+  height : 700px;
+  align-self: center;
+  background-color: black;
+} */
+.table-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between rows */
+}
+
+.table-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Space between tables */
+}
+
+.table-square {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+}
+

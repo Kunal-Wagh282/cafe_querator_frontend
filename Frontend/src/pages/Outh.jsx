@@ -50,7 +50,7 @@ const Outh = () => {
 
   const clientID = '44c18fde03114e6db92a1d4deafd6a43';
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
-  const redirectUri = 'https://cafe-querator.vercel.app/outh';
+  const redirectUri = 'http://localhost:5173/outh';
     
 
 
