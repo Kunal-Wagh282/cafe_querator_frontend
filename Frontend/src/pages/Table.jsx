@@ -4,7 +4,8 @@ import axios from 'axios';
 import '../styles/Table.css'; // Ensure CSS for styling
 import CONFIG from '../config'; // Import the API URL
 import Navbar from '../components/Navbar'; // Import the Navbar component
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 const Table = () => {
   const { cafename, tableid } = useParams(); // Extracts :cafename and :tableid from URL  
   const [cjwt, setCJwt] = useState('');
@@ -135,6 +136,7 @@ const Table = () => {
         return response.data.tracks.items; // Return search results
       } catch (error) {
         console.error('Error searching for songs:', error);
+        notify("info","Please Select a song!!");
         return []; // Return an empty array on error
       }
     };
@@ -183,11 +185,41 @@ const Table = () => {
           if (response.status === 200) {
             fetchQueue(); // Refresh queue
             setSearchQuery('');
-
+            notify("success","Your Song Is Added!!");
           }
         }
       } catch (error) {
         console.error('Error adding song:', error);
+      }
+    };
+    
+    const notify = (type, message) => {
+      const config = {
+        position: "top-center", // Positioning the toast
+        autoClose: 5000,        // Auto-close after 5 seconds
+        hideProgressBar: false, // Show progress bar
+        closeOnClick: true,     // Close on click
+        pauseOnHover: true,     // Pause when hovered
+        draggable: true,        // Allow dragging
+        progress: undefined,    // No custom progress bar
+      };
+    
+      switch (type) {
+        case "success":
+          toast.success(message, config);
+          break;
+        case "error":
+          toast.error(message, config);
+          break;
+        case "info":
+          toast.info(message, config);
+          break;
+        case "warning":
+          toast.warning(message, config);
+          break;
+        default:
+          toast(message, config); // Default toast type
+          break;
       }
     };
     
@@ -208,6 +240,7 @@ const Table = () => {
         <button className="sidebar-btn" onClick={addTrack}>
           Add Song to Queue
         </button>
+        <ToastContainer />
       </div>
       
       {suggestions.length > 0 && (

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
 import CONFIG from '../config'; // Import the API URL
-
+import Preloader from '../components/Prealoader';
 
 const Dashboard = () => {
   // State variables
@@ -56,6 +56,15 @@ const Dashboard = () => {
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
   const redirectUri = 'http://localhost:5173/dashboard';
 
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); // Simulate data loading or some async operation
+    }, 3000); // The preloader will display for 3 seconds
+  }, []);
+
   useEffect(() => {
     fetchQueue();
   }, []);
@@ -95,10 +104,10 @@ const Dashboard = () => {
           "Content-Type": "application/json"
         },
       });
-  
-      if (response.status === 200 && response.data.Queue) 
+      
+      if (response.status === 200 && response.data.Next_track) 
       {
-        const data = response.data.Queue;
+        const data = response.data.Next_track;
         console.log(data.track_id);
   
         // Update the state with the next track details
@@ -135,6 +144,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching the next track:", error);
+      alert("No Songs in the Queue!")
     }
   };
   
@@ -601,7 +611,11 @@ const playSong = async (track_id) => {
 
   // Render the component
   return (
+    
     <div className="dashboard-container">
+        {loading ? (
+        <Preloader /> // Show the preloader
+      ) : (<></>)}
       <header className="dashboard-header">
         <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
         <p><br /><br  /><br/>Let's change the vibe today!</p>
@@ -729,7 +743,7 @@ const playSong = async (track_id) => {
           </div>
         </div>
 
-
+            
     </div>
 
   );
