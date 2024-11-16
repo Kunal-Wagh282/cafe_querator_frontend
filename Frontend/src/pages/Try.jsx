@@ -105,10 +105,12 @@ const Dashboard = () => {
         setTrack_Artist_Name(data.track_artist_name);
         setTrack_Image_Url(data.track_img_url);
   
-        // Fetch the queue to ensure it’s up to date
-        await fetchQueue(); 
+         
+        // Play the next track
+        playSong(data.track_id); // Call your existing playSong function
+
         // If needed, send a POST request to notify the backend that the track has been played
-        if (response.data.Queue.track_id === queue[0].track_id) {
+        
           try {
             const postResponse = await axios.post(`${CONFIG.QUEUE_URL}/next-track`, {}, {
               headers: {
@@ -120,9 +122,10 @@ const Dashboard = () => {
           } catch (error) {
             console.error("Error removing track from queue:", error);
           }
-        }
-        // Play the next track
-        playSong(data.track_id); // Call your existing playSong function
+        
+        // Fetch the queue to ensure it’s up to date
+        await fetchQueue();
+        
       } 
       else {
         console.log("No next track available.");
@@ -153,20 +156,57 @@ const Dashboard = () => {
           localStorage.setItem("device_id",device_id)
         });
   
+        // spotifyPlayer.addListener('player_state_changed', state => {
+        //   if (state) {
+        //     setTrackName(state.track_window.current_track.name);
+        //     setArtistName(
+        //       state.track_window.current_track.artists.map(artist => artist.name).join(', ')
+        //     );
+        //     setIsPaused(state.paused);
+  
+        //     // Detect when a track has ended
+        //     if (state.track_window.previous_tracks.length >= 0 && state.paused && !state.loading) {
+        //       playNextSong(); // Call the next song API
+        //     }
+        //   }
+        // });
         spotifyPlayer.addListener('player_state_changed', state => {
           if (state) {
-            setTrackName(state.track_window.current_track.name);
-            setArtistName(
-              state.track_window.current_track.artists.map(artist => artist.name).join(', ')
-            );
-            setIsPaused(state.paused);
-  
-            // Detect when a track has ended
-            if (state.track_window.previous_tracks.length > 0 && state.paused && !state.loading) {
-              playNextSong(); // Call the next song API
-            }
+              setTrackName(state.track_window.current_track.name);
+              setArtistName(
+                  state.track_window.current_track.artists.map(artist => artist.name).join(', ')
+              );
+              setIsPaused(state.paused);
+      
+              const endTimeoutDelay = state.duration - state.position - 5000; // Pause before 5 seconds of song ends
+              const waitDelay = 5 * 1000; // Wait 5 seconds before skipping
+              const resumeTimeoutDelay = endTimeoutDelay + waitDelay;
+      
+              // Clear existing timeouts if they exist
+              if (window.spotifyTimeout1) {
+                  clearTimeout(window.spotifyTimeout1);
+              }
+              if (window.spotifyTimeout2) {
+                  clearTimeout(window.spotifyTimeout2);
+              }
+      
+              // Set a timeout to pause the song 5 seconds before it ends
+              window.spotifyTimeout1 = setTimeout(() => {
+                  console.log('Song Ended');
+                  window.spotify_player && window.spotify_player.pause();
+                  console.log('Waiting 5 Seconds...');
+                  // Call playNextSong after the song has ended and 5 seconds have passed
+                  playNextSong();
+              }, endTimeoutDelay);
+      
+              // Set a timeout to skip the song after waiting 5 seconds
+              window.spotifyTimeout2 = setTimeout(() => {
+                  console.log('Resuming Song...');
+                  window.spotify_player && window.spotify_player.nextTrack();
+              }, resumeTimeoutDelay);
           }
-        });
+      });
+      
   
         spotifyPlayer.connect();
         setPlayer(spotifyPlayer);
@@ -234,7 +274,8 @@ const Dashboard = () => {
       const newExpiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
       setExpiresAt(newExpiresAt); // Update the expiration time
       console.log("Access token refreshed successfully.");
-      sendTokenToBackend(access_token, refreshToken, newExpiresAt);     
+      const spotifyRefreshToken = response.data.refresh_token || refreshToken;
+      sendTokenToBackend(access_token, spotifyRefreshToken, newExpiresAt);     
       } 
     catch (error) {
       console.error("Error refreshing access token:", error);
@@ -404,12 +445,11 @@ const playSong = async (track_id) => {
       const results = await searchSongs(searchQuery);
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
-        setSongname(selectedTrack.name);
-        setTrackid(selectedTrack.id);
+        
 
         // Fetch the song features
         //const features = await fetchSongFeatures(trackId);
-        playSong(selectedTrack.id);
+        //playSong(selectedTrack.id);
         try {
           const response = await axios.post(
             `${CONFIG.QUEUE_URL}/add-track`,
