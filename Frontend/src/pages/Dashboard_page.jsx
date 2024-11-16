@@ -597,7 +597,22 @@ const playSong = async (track_id) => {
   // fetching hte features of the playlists 
   
    
-  
+  // get qr function 
+  const getQRcode = async () => {
+    try {
+      const response = await axios.post(`${CONFIG.API_URL}/genpdf`,{}, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+        },
+      });
+      if (response.status === 200) {
+        console.log('QR Generated');
+      }
+    } catch (error) {
+      console.error('Error in generating QR', error);
+    }
+  };
+
 
   // Render the component
   return (
@@ -624,6 +639,7 @@ const playSong = async (track_id) => {
             }}>
             Start Vibe
           </button>
+          <button className="sidebar-btn" onClick={getQRcode} >Table QR</button>
 
           <form onSubmit={handlePlaylistSearchSubmit}>
             <input  
