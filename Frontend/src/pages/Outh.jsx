@@ -65,6 +65,7 @@ const Outh = () => {
           exchangeAuthorizationCode(authorizationCode)
             .then(({ accessToken, refreshToken, expiresAt }) => {
               //setAccessToken(accessToken); // Set access token
+              console.log(accessToken, refreshToken, expiresAt)
               return sendTokenToBackend(accessToken, refreshToken, expiresAt);
             })
             .then(() => {
@@ -96,6 +97,7 @@ const Outh = () => {
         }
         ); // Added withCredentials
         } catch (error) {
+            console.log(error)
           throw new Error('Error sending token to backend');
         }
       };
