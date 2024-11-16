@@ -48,8 +48,6 @@ const Dashboard = () => {
 
   // Cafe/Feature Info
   const [cafeInfo, setCafeInfo] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [features, setSongFeatures] = useState([]);
 
   // Routing and Navigation
   const navigate = useNavigate();
@@ -57,9 +55,7 @@ const Dashboard = () => {
   // Miscellaneous
   const clientID = '44c18fde03114e6db92a1d4deafd6a43';
   const clientSecret = '645c1dfc9c7a4bf88f7245ea5d90b454';
-  const redirectUri = 'http://localhost:5173/outh';
-
-
+  // const redirectUri = 'https://cafe-querator.vercel.app/outh';
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,24 +79,25 @@ const Dashboard = () => {
     }
   }, [totalTables]);
   // Effect to handle fetching token and cafe info
-  useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const authorizationCode = query.get('code');
-    if (authorizationCode) {
-      exchangeAuthorizationCode(authorizationCode)
-        .then(({ accessToken, refreshToken, expiresAt }) => {
-          setAccessToken(accessToken); // Set access token
-          return sendTokenToBackend(accessToken, refreshToken, expiresAt);
-        })
-        .then(() => {
-          fetchCafeInfo(); // Fetch cafe info
-        })
-        .catch((error) => {
-          console.error('Error during authorization:', error);
-        });
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [navigate]);
+  // useEffect(() => {
+  //   const query = new URLSearchParams(window.location.search);
+  //   const authorizationCode = query.get('code');
+  //   if (authorizationCode) {
+  //     exchangeAuthorizationCode(authorizationCode)
+  //       .then(({ accessToken, refreshToken, expiresAt }) => {
+  //         setAccessToken(accessToken); // Set access token
+  //         return sendTokenToBackend(accessToken, refreshToken, expiresAt);
+  //       })
+  //       .then(() => {
+  //         fetchCafeInfo(); // Fetch cafe info
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error during authorization:', error);
+  //       });
+
+  //     window.history.replaceState({}, document.title, window.location.pathname);
+  //   }
+  // }, [navigate]);
 
   const playNextSong = async () => {
     try {
@@ -227,7 +224,6 @@ const Dashboard = () => {
           }
       });
       
-  
         spotifyPlayer.connect();
         setPlayer(spotifyPlayer);
       };
@@ -295,6 +291,10 @@ const Dashboard = () => {
       setExpiresAt(newExpiresAt); // Update the expiration time
       console.log("Access token refreshed successfully.");
       const spotifyRefreshToken = response.data.refresh_token || refreshToken;
+      if(response.data.refresh_token)
+      {
+        localStorage.setItem("refresh_token",response.data.refresh_token)
+      }
       sendTokenToBackend(access_token, spotifyRefreshToken, newExpiresAt);     
       } 
     catch (error) {
@@ -309,31 +309,31 @@ const Dashboard = () => {
   };
 
   // Function to exchange authorization code for tokens
-  const exchangeAuthorizationCode = async (code) => {
-    try {
-      const response = await axios.post('https://accounts.spotify.com/api/token', null, {
-        params: {
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: redirectUri,
-          client_id: clientID,
-          client_secret: clientSecret,
-        },
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
+  // const exchangeAuthorizationCode = async (code) => {
+  //   try {
+  //     const response = await axios.post('https://accounts.spotify.com/api/token', null, {
+  //       params: {
+  //         grant_type: 'authorization_code',
+  //         code: code,
+  //         redirect_uri: redirectUri,
+  //         client_id: clientID,
+  //         client_secret: clientSecret,
+  //       },
+  //       headers: {
+  //         'Content-Type': 'application/x-www-form-urlencoded',
+  //       },
+  //     });
 
-      const { access_token, refresh_token, expires_in } = response.data;
-      setAccessToken(access_token);
-      setRefreshToken(refresh_token)
-      localStorage.setItem("refresh_token",refresh_token)
-      const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
-      return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
-    } catch (error) {
-      throw new Error('Error exchanging authorization code');
-    }
-  };
+  //     const { access_token, refresh_token, expires_in } = response.data;
+  //     setAccessToken(access_token);
+  //     setRefreshToken(refresh_token)
+  //     localStorage.setItem("refresh_token",refresh_token)
+  //     const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
+  //     return { accessToken: access_token, refreshToken: refresh_token, expiresAt };
+  //   } catch (error) {
+  //     throw new Error('Error exchanging authorization code');
+  //   }
+  // };
 
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
