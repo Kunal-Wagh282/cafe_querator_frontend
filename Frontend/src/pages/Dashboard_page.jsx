@@ -749,7 +749,7 @@ const playSong = async (track_id) => {
                 value={searchQuery}
                 onChange={handleSearchInputChange}
               />
-              <button type="submit">Add & Play</button>
+              <button type="submit">Add to Queue</button>
             </form> 
 
             {suggestions.length > 0 && (

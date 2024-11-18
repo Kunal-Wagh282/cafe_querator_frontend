@@ -5,10 +5,10 @@ const Socket = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt'); // Retrieve JWT token from localStorage
+    const jwt = localStorage.getItem('jwt'); // Retrieve JWT token from localStorage
+    console.log(jwt)
+    const ws = new WebSocket(`ws://cafequerator-backend.onrender.com/ws/queue/?jwt=${jwt}`);
 
-    const ws = new WebSocket(`wss://your-backend-domain/ws/some_endpoint/?token=${token}`);
-    
     ws.onopen = () => {
       console.log('WebSocket connection established');
     };
