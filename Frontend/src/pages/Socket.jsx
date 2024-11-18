@@ -5,8 +5,10 @@ const Socket = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket('wss://your-backend-domain/ws/some_endpoint/');
+    const token = localStorage.getItem('jwt'); // Retrieve JWT token from localStorage
 
+    const ws = new WebSocket(`wss://your-backend-domain/ws/some_endpoint/?token=${token}`);
+    
     ws.onopen = () => {
       console.log('WebSocket connection established');
     };

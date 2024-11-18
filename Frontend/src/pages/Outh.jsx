@@ -51,6 +51,7 @@ const Outh = () => {
           }
         }
         ); // Added withCredentials
+        console.log("Token Sent to Backend")
         } catch (error) {
             console.log(error)
           throw new Error('Error sending token to backend');
@@ -75,8 +76,6 @@ const Outh = () => {
           });
     
           const { access_token, refresh_token, expires_in } = response.data;
-          //setAccessToken(access_token);
-          //setRefreshToken(refresh_token)
           localStorage.setItem("refresh_token",refresh_token)
           const expiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
           return { accessToken: access_token, refreshToken: refresh_token, expiresAt };

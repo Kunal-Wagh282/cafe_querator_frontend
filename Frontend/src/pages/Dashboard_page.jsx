@@ -260,12 +260,12 @@ const Dashboard = () => {
       setAccessToken(access_token);
       const newExpiresAt = new Date(new Date().getTime() + parseInt(expires_in, 10) * 1000).toISOString();
       setExpiresAt(newExpiresAt); // Update the expiration time
-      console.log("Access token refreshed successfully.");
       const spotifyRefreshToken = response.data.refresh_token || refreshToken;
       if(response.data.refresh_token)
       {
         localStorage.setItem("refresh_token",response.data.refresh_token)
       }
+      console.log("Access token refreshed successfully.");
       sendTokenToBackend(access_token, spotifyRefreshToken, newExpiresAt);     
       } 
     catch (error) {
@@ -282,6 +282,7 @@ const Dashboard = () => {
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
     try {
+      if(refreshToken){
       await axios.post(`${CONFIG.API_URL}/settoken`, 
         {
         access_token: accessToken,
@@ -296,6 +297,7 @@ const Dashboard = () => {
     }
     ); // Added withCredentials
     console.log("Token Sent to Backend")
+    }
     } catch (error) {
       throw new Error('Error sending token to backend');
     }
@@ -314,6 +316,7 @@ const Dashboard = () => {
       localStorage.setItem("refresh_token",token_info.refresh_token);
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
+      setRefreshToken(token_info.refresh_token);
       setExpiresAt(token_info.expires_at);
       setTotalTables(cafe_info.No_of_Tables)
     } catch (error) {
@@ -761,8 +764,6 @@ const playSong = async (track_id) => {
             
           </div>
         </div>
-
-            
     </div>
 
   );
