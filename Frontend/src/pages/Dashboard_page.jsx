@@ -31,6 +31,7 @@ const Dashboard = () => {
   // table number const
   const [totalTables, setTotalTables ]= useState("") ; // You can change this value dynamically if needed
   const [rows, setRows ]= useState([]) ; // You can change this value dynamically if needed
+  const [tableColors, setTableColors] = useState({});
 
 
   // Search and Suggestions
@@ -591,7 +592,7 @@ const playSong = async (track_id) => {
   
   };
 
-
+// --------------------------------------------------------main section code for the table functionality------------------------------------------------------------
         // Function to generate table rows dynamically
         const generateTableRows = (numberOfTables) => {
           const tables = Array.from({ length: numberOfTables }, (_, index) => index + 1);
@@ -604,6 +605,44 @@ const playSong = async (track_id) => {
 
           return rows;
         };
+
+
+        // function to give clickable event of the table
+
+        // const handleTableClick = async (table) => {
+        //   console.log(`Table ${table} clicked!`);
+          
+          // API call
+          const handleTableClick = async (table) => {
+            console.log(`Table ${table} clicked!`);
+        
+            // Toggle table color
+            setTableColors((prevColors) => ({
+              ...prevColors,
+              [table]: prevColors[table] === 'green' ? 'red' : 'green',
+            }));
+        
+            // API call logic (optional)
+            try {
+              const response = await axios.post(
+                `${CONFIG.QUEUE_URL}/remove-table`,
+                {
+                  table_no: table,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${jwt}`, // Replace with actual JWT
+                  },
+                }
+              );
+              console.log('API response:', response.data);
+            } catch (error) {
+              console.error('Error during API call:', error);
+            }
+          };
+          
+        
+
 
   // Render the component
   return (
@@ -658,21 +697,44 @@ const playSong = async (track_id) => {
                 </div>
               )}
         </div>
-       
-        <div className="main-section">
-          <div className="table-status">
-            {/* Render the rows of tables */}
-            {rows.map((row, rowIndex) => (
-              <div key={rowIndex} className="table-row">
-                {row.map((table) => (
-                  <div key={table} className="table-square">
-                    {table}
-                  </div>
-                ))}
-              </div>
-            ))}
+      
+       {/* --------------------------this is the main sectio code----------------------------- */}
+          <div className="main-section">
+            <div className="table-heading">
+              <h1>Table</h1>
+            </div>
+            <div className="table-status">
+              {rows.map((row, rowIndex) => (
+                <div key={rowIndex} className="table-row">
+                  {row.map((table) => (
+                    <div
+                      key={table}
+                      className="table-square"
+                      onClick={() => handleTableClick(table)}
+                      role="button"
+                      tabIndex={0}
+                      style={{
+                        cursor: 'pointer',
+                        backgroundColor: tableColors[table] || 'red', // Default to red
+                        width: '50px',
+                        height: '50px',
+                        display: 'inline-block',
+                        margin: '5px',
+                        textAlign: 'center',
+                        lineHeight: '50px',
+                        color: 'white',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {table}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        
+
 
         <div className="queue-section">
           <h2>Queue</h2>
