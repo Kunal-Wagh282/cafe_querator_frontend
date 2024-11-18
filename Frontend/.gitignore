@@ -105,9 +105,7 @@ node_modules/
 .DS_Store
 
 # Environment variables
-.env
-.env.local
-.env.*.local
+
 
 # Vite cache
 .vite/

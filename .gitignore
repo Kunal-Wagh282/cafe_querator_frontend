@@ -34,7 +34,7 @@ pyvenv.cfg
 # settings.py
 
 # If you have environment variables in a .env file
-.env
+
 
 # Django migrations
 **/migrations/*.py
@@ -104,10 +104,7 @@ node_modules/
 *.log
 .DS_Store
 
-# Environment variables
-.env
-.env.local
-.env.*.local
+# Environment variable
 
 # Vite cache
 .vite/
