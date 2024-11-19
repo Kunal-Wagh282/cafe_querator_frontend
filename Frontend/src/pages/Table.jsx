@@ -66,13 +66,14 @@ const Table = () => {
 
       ws.onmessage = (event) => {
         //const data = JSON.parse(event.data);
-        console.log(event)
+        console.log(event.data)
         if (event.data === 'queue updated') {
           fetchQueue();
         }
         if (event.data === 'current track updated') {
           //fetchQueue();
         }
+        
       };
 
       ws.onclose = (event) => {

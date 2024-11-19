@@ -7,6 +7,8 @@ import Preloader from '../components/Prealoader';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause, faForward ,faBackward} from "@fortawesome/free-solid-svg-icons";
 import tableImage from '../images/table.png';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 
 
 const Dashboard = () => {
@@ -114,7 +116,6 @@ const Dashboard = () => {
         }
         if(event.data === 'Table Status updated')
         {
-          console.log("Changle color")
           updateTables();
         }
       };
@@ -698,7 +699,7 @@ const playSong = async (track_id) => {
                 }, {});
                 setTableColors(initialColors);   
               
-              console.log('Table statuses updated:', table_status);
+              console.log('Table statuses updated');
             } else {
               console.error('API response does not contain table_status:', response.data);
             }
@@ -714,7 +715,7 @@ const playSong = async (track_id) => {
           // API call
           const handleTableClick = async (table) => {
             console.log(`Table ${table} clicked!`);
-          
+            
             setTableColors((prevColors) => {
               if (prevColors[table] === 'green') {
                 return { ...prevColors, [table]: 'red' }; // Optimistically update to red
@@ -738,6 +739,8 @@ const playSong = async (track_id) => {
                   }
                 );
                 console.log('API response:', response.data);
+                notify('success',`Table ${table} status off!`)
+
               } catch (error) {
                 console.error('Error during API call:', error);
           
@@ -756,6 +759,37 @@ const playSong = async (track_id) => {
 
 
 
+          const notify = (type, message) => {
+            const config = {
+              position: "top-center", // Positioning the toast
+              autoClose: 5000,        // Auto-close after 5 seconds
+              hideProgressBar: false, // Show progress bar
+              closeOnClick: true,     // Close on click
+              pauseOnHover: true,     // Pause when hovered
+              draggable: true,        // Allow dragging
+              progress: undefined,    // No custom progress bar
+            };
+          
+            switch (type) {
+              case "success":
+                toast.success(message, config);
+                break;
+              case "error":
+                toast.error(message, config);
+                break;
+              case "info":
+                toast.info(message, config);
+                break;
+              case "warning":
+                toast.warning(message, config);
+                break;
+              default:
+                toast(message, config); // Default toast type
+                break;
+            }
+          };
+
+
   // Render the component
   return (
     
@@ -772,6 +806,7 @@ const playSong = async (track_id) => {
             <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
       </header>
+      <ToastContainer />
 
       <div className="dashboard-content">
         <div className="sidebar">
