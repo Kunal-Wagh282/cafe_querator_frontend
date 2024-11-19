@@ -15,7 +15,7 @@
   justify-content: baseline;
   align-items: center;
   bottom : 0 ;
-  width: 100%; /* Full width of the screen */
+  width: 96.5%; /* Full width of the screen */
   height: 10vh; /* 1/10th of the screen height */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
   padding-left: 50px;
@@ -113,8 +113,6 @@
 
 .queue-list{
   height : 85%;
-  background-color: black;
-  color: black;
 }
 
 /* Optional music player styling */
@@ -346,11 +344,21 @@
 .table-square{
   border-radius : 50px ;
   padding : 20 20 20 20 ;
+  color : white;
+  align-items: center;
+  text-align: center; 
   align-items: center;
   justify-content: center;
+
 }
 
 .table-square img{
-  height : 80px ;
-  width : 80px ;
+  height : 95px ;
+  width : 95px ;
+  display : block ;
+}
+
+.indi-table{
+  position: absolute;
+
 }

@@ -766,7 +766,7 @@ const playSong = async (track_id) => {
       <header className="dashboard-header">
         <div className="heading">
             <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
-            <h7>Let's change the vibe today!</h7>
+            Let's change the vibe today!
         </div>
         <div className='Logout'>
             <button className="logout-btn" onClick={handleLogout}>Logout</button>
@@ -832,20 +832,21 @@ const playSong = async (track_id) => {
                       style={{
                         cursor: 'pointer',
                         backgroundColor: tableColors[table] || 'red', // Default to red
-                        width: '60px',
-                        height: '60px',
-                        display: 'inline-block',
-                        margin: '30px',
+                        width: '49px',
+                        height: '49px',
+                        display: 'flex',
+                        margin: '25px',
                         textAlign: 'center',
                         lineHeight: '50px',
-                        color: 'white',
+                        color: 'black',
                         fontWeight: 'bold',
-                      }}
-                    >
-                      {table}
-                    
-                      <img src={tableImage} alt="Cafe Illustration" />
+                        postion:'relative'
+                      }}>
                       
+                    <div className='indi-table'>
+                      {table}
+                    </div>  
+                      <img src={tableImage} alt="Cafe Illustration" class="Image"/>
                     </div>
                   ))}
                 </div>
