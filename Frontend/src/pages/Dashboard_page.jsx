@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/Dashboard.css'; // Add your styles here
 import CONFIG from '../config'; // Import the API URL
 import Preloader from '../components/Prealoader';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faPause, faForward ,faBackward} from "@fortawesome/free-solid-svg-icons";
+import tableImage from '../images/table.png';
+
 
 const Dashboard = () => {
   // State variables
@@ -670,9 +674,6 @@ const playSong = async (track_id) => {
 
 
         // function to give clickable event of the table
-
-        // const handleTableClick = async (table) => {
-        //   console.log(`Table ${table} clicked!`);
           
           // API call
           const handleTableClick = async (table) => {
@@ -705,6 +706,9 @@ const playSong = async (track_id) => {
           
         
 
+          // ----------------------------------------------------------------song progress bar---------------------------------------------------------------------------
+
+
 
   // Render the component
   return (
@@ -714,9 +718,13 @@ const playSong = async (track_id) => {
         <Preloader /> // Show the preloader
       ) : (<></>)}
       <header className="dashboard-header">
-        <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
-        <p><br /><br  /><br/>Let's change the vibe today!</p>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <div className="heading">
+            <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
+            <h7>Let's change the vibe today!</h7>
+        </div>
+        <div className='Logout'>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        </div>
       </header>
 
       <div className="dashboard-content">
@@ -760,7 +768,7 @@ const playSong = async (track_id) => {
               )}
         </div>
       
-       {/* --------------------------this is the main sectio code----------------------------- */}
+       {/* --------------------------this is the main section code----------------------------- */}
           <div className="main-section">
             <div className="table-heading">
               <h1>Table</h1>
@@ -778,10 +786,10 @@ const playSong = async (track_id) => {
                       style={{
                         cursor: 'pointer',
                         backgroundColor: tableColors[table] || 'red', // Default to red
-                        width: '50px',
-                        height: '50px',
+                        width: '60px',
+                        height: '60px',
                         display: 'inline-block',
-                        margin: '5px',
+                        margin: '30px',
                         textAlign: 'center',
                         lineHeight: '50px',
                         color: 'white',
@@ -789,6 +797,9 @@ const playSong = async (track_id) => {
                       }}
                     >
                       {table}
+                    
+                      <img src={tableImage} alt="Cafe Illustration" />
+                      
                     </div>
                   ))}
                 </div>
@@ -834,52 +845,60 @@ const playSong = async (track_id) => {
           </div>
           <div>
           <h1>Ongoing Queue</h1>
-        </div>
-        
-        {/* Queue Section */}
-          <div className="queue">
-            <ul className="queue-list">
-              {queue.length > 0 ? (
-                queue.map((track, index) => (
-                  <li key={index} className="queue-item">
-                    {/* Display song image dynamically */}
-                    <img 
-                      src={track.track_img_url || 'https://placeholder.com/150'} // Use dynamic image URL
-                      alt={track.track_name}
-                      className="track-image"
-                    />
-                    <div className="track-info">
-                      {/* Display song name dynamically */}
-                      <span className="track-name">{track.track_name}</span>
-                      {/* Display artist name dynamically */}
-                      <span className="artist-name">{track.track_artist_name}</span>
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <p className="no-songs">No songs in the queue</p>
-              )}
-            </ul>
           </div>
-
-        </div>
+        
+          {/* Queue Section */}
+            <div className="queue">
+              <ul className="queue-list">
+                {queue.length > 0 ? (
+                  queue.map((track, index) => (
+                    <li key={index} className="queue-item">
+                      {/* Display song image dynamically */}
+                      <img 
+                        src={track.track_img_url || 'https://placeholder.com/150'} // Use dynamic image URL
+                        alt={track.track_name}
+                        className="track-image"
+                      />
+                      <div className="track-info">
+                        {/* Display song name dynamically */}
+                        <span className="track-name">{track.track_name}</span>
+                        {/* Display artist name dynamically */}
+                        <span className="artist-name">{track.track_artist_name}</span>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <p className="no-songs">No songs in the queue</p>
+                )}
+              </ul>
+            </div>
+          </div>
       </div>
 
 
       {/* Current Song Section */}
-        <div className="current-song-section">
-          <h3>Now Playing</h3>
-          <div className="current-song-info">
+        <div className="current-song-sectiond">
+          <div className="current-heading">
+            <h3>Now Playing  :</h3>
+          </div>
+          <div className="current-song-infoo">
             {/* Display the album art dynamically */}
-            <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+            <div className="song-image">
+              {/* image of the song or album */}
+              <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+            </div>
             <div className="current-song-details">
               {/* Display the current song name dynamically */}
               <p className="song-title">{songName || 'Song Title'}</p>
               {/* Display the artist name dynamically */}
-              <p className="artist-name">{track_artist_name || 'Artist Name'}</p>
-              <button onClick={handlePlayPause}>{isPaused ? 'Play' : 'Pause'}</button>
-              <button onClick={playNextSong}>Next Song PLay</button>
-
+              <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
+            </div>
+            <div className="current-song-buttons">
+              <button ><FontAwesomeIcon icon={faBackward} /></button>
+              <button onClick={handlePlayPause}>{isPaused ? (<FontAwesomeIcon icon={faPlay} />) : (<FontAwesomeIcon icon={faPause} />)}</button>
+              <button onClick={playNextSong}><FontAwesomeIcon icon={faForward} /></button>
+            </div>
+            <div className="music-progress-bar">
               
             </div>
             
