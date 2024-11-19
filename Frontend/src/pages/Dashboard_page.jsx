@@ -5,7 +5,9 @@ import '../styles/Dashboard.css'; // Add your styles here
 import CONFIG from '../config'; // Import the API URL
 import Preloader from '../components/Prealoader';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause, faForward } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPause, faForward ,faBackward} from "@fortawesome/free-solid-svg-icons";
+import tableImage from '../images/table.png';
+
 
 const Dashboard = () => {
   // State variables
@@ -658,9 +660,13 @@ const playSong = async (track_id) => {
         <Preloader /> // Show the preloader
       ) : (<></>)}
       <header className="dashboard-header">
-        <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
-        <p><br /><br  /><br/>Let's change the vibe today!</p>
-        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        <div className="heading">
+            <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
+            <h7>Let's change the vibe today!</h7>
+        </div>
+        <div className='Logout'>
+            <button className="logout-btn" onClick={handleLogout}>Logout</button>
+        </div>
       </header>
 
       <div className="dashboard-content">
@@ -722,18 +728,20 @@ const playSong = async (track_id) => {
                       style={{
                         cursor: 'pointer',
                         backgroundColor: tableColors[table] || 'red', // Default to red
-                        width: '90px',
-                        height: '90px',
+                        width: '60px',
+                        height: '60px',
                         display: 'inline-block',
-                        margin: '5px',
+                        margin: '30px',
                         textAlign: 'center',
                         lineHeight: '50px',
                         color: 'white',
                         fontWeight: 'bold',
-                      
                       }}
                     >
                       {table}
+                    
+                      <img src={tableImage} alt="Cafe Illustration" />
+                      
                     </div>
                   ))}
                 </div>
@@ -812,7 +820,9 @@ const playSong = async (track_id) => {
 
       {/* Current Song Section */}
         <div className="current-song-sectiond">
-          <h3>Now Playing  :</h3>
+          <div className="current-heading">
+            <h3>Now Playing  :</h3>
+          </div>
           <div className="current-song-infoo">
             {/* Display the album art dynamically */}
             <div className="song-image">
@@ -826,6 +836,7 @@ const playSong = async (track_id) => {
               <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
             </div>
             <div className="current-song-buttons">
+              <button ><FontAwesomeIcon icon={faBackward} /></button>
               <button onClick={handlePlayPause}>{isPaused ? (<FontAwesomeIcon icon={faPlay} />) : (<FontAwesomeIcon icon={faPause} />)}</button>
               <button onClick={playNextSong}><FontAwesomeIcon icon={faForward} /></button>
             </div>

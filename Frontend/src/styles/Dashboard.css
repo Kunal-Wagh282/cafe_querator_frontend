@@ -12,12 +12,22 @@
   grid-column: 1 / -1; /* Span all columns to cover full width */
   background-color: #6B7A40; /* Customize the background color */
   display: flex;
-  justify-content: center;
+  justify-content: baseline;
   align-items: center;
+  bottom : 0 ;
   width: 100%; /* Full width of the screen */
   height: 10vh; /* 1/10th of the screen height */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+  padding-left: 50px;
+  color : white ;
+  flex-direction: row ;
 }
+
+.heading {
+  width : 90% ;
+  /* background-color: white; */
+}
+
 
 /* Header text styling */
 .dashboard-header h1 {
@@ -103,6 +113,8 @@
 
 .queue-list{
   height : 85%;
+  background-color: black;
+  color: black;
 }
 
 /* Optional music player styling */
@@ -222,10 +234,18 @@
 
 .song-image {
   grid-column: 1; /* Place the song image in the first column */
-  justify-self: center; /* Center the image horizontally within its grid area */
-  height : 50px ;
-  width : 50px;
+  justify-self: left; /* Center the image horizontally within its grid area */
+  height : 80px ;
+  width : 80px;
   background-color: blue;
+  border-radius:5px;
+  flex-direction: column ;
+
+}
+.song-image img{
+  height : 100% ;
+  width: 100%;
+  border-radius: 5px;
 }
 
 .current-song-details {
@@ -233,7 +253,12 @@
   display: flex;
   flex-direction: column; /* Stack the song title and artist vertically */
   justify-content: center; /* Vertically center the content */
+  justify-self : left ;
   align-items: center; /* Horizontally center the content */
+  width : 100%;
+  height : 80%;
+  background-color: white;
+  border-radius : 5px ;
 }
 
 
@@ -247,23 +272,26 @@
   height : 80px;
   border-radius: 12px ;
   display: grid;
-  grid-template-rows: 1fr 1fr 1fr 10fr; /* Three columns: 1 for image, 2 for details, 1 for buttons */
+  grid-template-rows: 2fr 2fr 20fr; /* Three columns: 1 for image, 2 for details, 1 for buttons */
   /* grid-template-rows: 80px; Adjust row height automatically */
-  gap: 20px; /* Optional gap between the columns */
+  gap: 5px; /* Optional gap between the columns */
   background-color:#F7E7CE;
   width : 85%;
   align-items: center;
+  padding : 5px;
+  column-rule-color: #0056b3;
 }
 
 
 .current-song-buttons {
-  padding: 15px;
   grid-column: 3; /* Place the buttons in the third column */
   display: flex;
   flex-direction: row; /* Arrange buttons horizontally */
   justify-content: center; /* Center buttons horizontally */
   align-items: center ;
   gap: 10px; /* Space between the buttons */
+  /* background-color: white ; */
+  
 }
 
 .current-song-buttons button {
@@ -302,4 +330,27 @@
   background-color: #1DB954; /* Spotify green color */
   height: 100%;
   border-radius: 5px;
+}
+
+.current-heading{
+  display : flex ;
+  align-items: center;
+  width: 150px;
+  height : 90% ;
+  background-color: white;
+  border-radius:5px ;
+  padding-left: 30px;
+}
+
+/* ---------------------------------------------------------------table-icon-------------------------------------------------------------------------- */
+.table-square{
+  border-radius : 50px ;
+  padding : 20 20 20 20 ;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-square img{
+  height : 80px ;
+  width : 80px ;
 }
