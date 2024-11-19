@@ -107,12 +107,15 @@ const Dashboard = () => {
         //const data = JSON.parse(event.data);
         console.log(event.data)
         if (event.data === 'queue updated') {
-          
           fetchQueue();
-  
         }
         if (event.data === 'current track updated') {
           //fetchQueue();
+        }
+        if(event.data === 'Table Status updated')
+        {
+          console.log("Changle color")
+          updateTables();
         }
       };
 
@@ -152,10 +155,10 @@ const Dashboard = () => {
       const response = await axios.get(`${CONFIG.QUEUE_URL}/next-track`, {
         headers: {
           "Authorization": `Bearer ${jwt}`, // Pass the access token if required
-          "Content-Type": "application/json"
-        },
+        }
       });
-  
+
+
       if (response.status === 200 && response.data.Next_track) 
       {
         const data = response.data.Next_track;
@@ -167,7 +170,6 @@ const Dashboard = () => {
         setTrack_Artist_Name(data.track_artist_name);
         setTrack_Image_Url(data.track_img_url);
   
-         
         // Play the next track
         playSong(data.track_id); // Call your existing playSong function
 
@@ -194,8 +196,8 @@ const Dashboard = () => {
         console.log("No next track available.");
       }
     } catch (error) {
-      console.error("Error fetching the next track:", error);
-      alert("No Songs in the Queue!")
+      console.log(error);
+      //alert("No Songs in the Queue!")
     }
   };
   
@@ -376,13 +378,21 @@ const Dashboard = () => {
         },
       });
       console.log(response.data)
-      const { cafe_info ,token_info } = response.data;
+      const { cafe_info ,token_info ,table_status } = response.data;
       localStorage.setItem("refresh_token",token_info.refresh_token);
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
       setRefreshToken(token_info.refresh_token);
       setExpiresAt(token_info.expires_at);
       setTotalTables(cafe_info.No_of_Tables)
+
+      if (table_status && Array.isArray(table_status)) {
+        const initialColors = table_status.reduce((acc, table) => {
+          acc[table.table_number] = table.table_status ? 'green' : 'red';
+          return acc;
+        }, {});
+        setTableColors(initialColors);   
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -464,10 +474,6 @@ const playSong = async (track_id) => {
     return null; // Return null on error
   }
 };
-
-
-
-
 
 
 
@@ -673,34 +679,74 @@ const playSong = async (track_id) => {
         };
 
 
+        const updateTables = async () => {
+          try {
+            const response = await axios.get(`${CONFIG.API_URL}/tablestatus`, {
+              headers: {
+                Authorization: `Bearer ${jwt}`, // Replace with actual JWT
+              },
+            });
+        
+            // Assuming the API response contains an object like:
+            // { table_status: { 1: "green", 2: "red", 3: "green", ... } }
+            const { table_status } = response.data;
+        
+            if (table_status) {
+                const initialColors = table_status.reduce((acc, table) => {
+                  acc[table.table_number] = table.table_status ? 'green' : 'red';
+                  return acc;
+                }, {});
+                setTableColors(initialColors);   
+              
+              console.log('Table statuses updated:', table_status);
+            } else {
+              console.error('API response does not contain table_status:', response.data);
+            }
+          } catch (error) {
+            console.error('Error while fetching table statuses:', error);
+          }
+        };
+        
+
+
         // function to give clickable event of the table
           
           // API call
           const handleTableClick = async (table) => {
             console.log(`Table ${table} clicked!`);
-        
-            // Toggle table color
-            setTableColors((prevColors) => ({
-              ...prevColors,
-              [table]: prevColors[table] === 'green' ? 'red' : 'green',
-            }));
-        
-            // API call logic (optional)
-            try {
-              const response = await axios.post(
-                `${CONFIG.QUEUE_URL}/remove-table`,
-                {
-                  table_no: table,
-                },
-                {
-                  headers: {
-                    Authorization: `Bearer ${jwt}`, // Replace with actual JWT
+          
+            setTableColors((prevColors) => {
+              if (prevColors[table] === 'green') {
+                return { ...prevColors, [table]: 'red' }; // Optimistically update to red
+              }
+              console.log("Table is already red, no API call will be made.");
+              return prevColors; // No update if already red
+            });
+          
+            // Access the current state directly for accurate logic
+            if (tableColors[table] === 'green') {
+              try {
+                const response = await axios.post(
+                  `${CONFIG.QUEUE_URL}/remove-table`,
+                  {
+                    table_no: table,
                   },
-                }
-              );
-              console.log('API response:', response.data);
-            } catch (error) {
-              console.error('Error during API call:', error);
+                  {
+                    headers: {
+                      Authorization: `Bearer ${jwt}`, // Replace with actual JWT
+                    },
+                  }
+                );
+                console.log('API response:', response.data);
+              } catch (error) {
+                console.error('Error during API call:', error);
+          
+                // Rollback the optimistic update in case of API failure
+                setTableColors((prevColors) => ({
+                  ...prevColors,
+                  [table]: 'green',
+                }));
+              }
             }
           };
           

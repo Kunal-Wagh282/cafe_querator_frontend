@@ -49,40 +49,58 @@ const Table = () => {
   
 
   useEffect(() => {
-    const cjwt = localStorage.getItem('cjwt'); // Retrieve JWT token from localStorage
-    if (!cjwt) {
-      console.error('CJWT token not found!');
-      return; // Handle this case accordingly (e.g., redirect to login)
-    }
-    const ws = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${cjwt}`);
-    ws.onopen = () => {
-      console.log('WebSocket connection established');
-    };
+    const timeoutId = setTimeout(() => {
+      const cjwt = localStorage.getItem('cjwt'); // Retrieve JWT token from localStorage
+      // console.log('JWT Token:', jwt);
 
-    ws.onmessage = (event) => {
-      //const data = JSON.parse(event.data);
-      console.log(event.data)
-      if (event.data === 'queue updated') {
-        fetchQueue();
+      if (!cjwt) {
+        console.error('JWT token not found!');
+        return; // Handle this case accordingly (e.g., redirect to login)
       }
-    };
 
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
+      const ws = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${cjwt}`);
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+      ws.onopen = () => {
+        console.log('WebSocket connection established');
+      };
 
-    setSocket(ws);
+      ws.onmessage = (event) => {
+        //const data = JSON.parse(event.data);
+        console.log(event)
+        if (event.data === 'queue updated') {
+          fetchQueue();
+        }
+        if (event.data === 'current track updated') {
+          //fetchQueue();
+        }
+      };
 
-    // Cleanup on component unmount
-    return () => {
-      ws.close();
-    };
+      ws.onclose = (event) => {
+        console.warn('WebSocket connection closed:', event);
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        console.log('Retrying connection...');
+        setTimeout(() => {
+          const newWs = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${cjwt}`);
+          setSocket(newWs);
+        }, 5000); // Retry after 5 seconds
+      };
+
+      setSocket(ws);
+
+      // Cleanup on component unmount
+      return () => {
+        ws.close();
+      };
+    }, 3000); // Delay of 5 seconds
+
+    // Cleanup the timeout if the component unmounts before the timeout completes
+    return () => clearTimeout(timeoutId);
   }, []);
-  
+
+
     
   const fetchToken = async () => {
     try {
