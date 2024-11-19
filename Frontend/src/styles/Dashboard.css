@@ -47,11 +47,11 @@
 /* Sidebar styling */
 .sidebar {
   background-color: #F5F5DC;
-  padding: 20px;
+  /* padding-left: ; */
   height: 100%; /* Fill the full height of content area */
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
 }
 
 /* Sidebar buttons */
@@ -63,7 +63,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 100%;
+  width: 60%;
   text-align: center;
   font-size: 1rem;
 }
@@ -82,7 +82,7 @@
 }
 
 /* Queue section styling */
-.queuee-section {
+.queue-section {
   background-color: #F5F5DC; /* Different background color for distinction */
   padding: 20px;
   height: 100%; /* Fill the full height of the content area */
@@ -90,6 +90,19 @@
   flex-direction: column;
   border-radius: 8px; /* Rounded corners for visual distinction */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  align-items: center;
+}
+
+.queue{
+  padding-left : 10px ; 
+  width : 80% ;
+  background-color: purple;
+  /* justify-content: center; */
+
+}
+
+.queue-list{
+  height : 85%;
 }
 
 /* Optional music player styling */
@@ -106,13 +119,6 @@
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for visual effect */
 }
 
-/* Player bar content (e.g., controls) */
-.player-bar {
-  width: 100%; /* Full width for content inside */
-  text-align: center; /* Center the content inside the player */
-  font-size: 1rem; /* Adjust font size for controls */
-  color: #333; /* Customize text color */
-}
 
 /* Suggestions dropdown styling */
 .suggestions {
@@ -173,7 +179,9 @@
   flex-direction: column;
   gap: 10px; /* Space between rows */
   background-color: white;
-  height : 500px ;
+  height : 400px ;
+  padding-top: 30px;
+  border-radius : 10px ;
 }
 
 .table-row {
@@ -195,5 +203,103 @@
   text-align: center;
 }
 
+/* --------------------------------------------------------------------------------------current song section------------------------------------------------------------------------------------------- */
+.current-song-sectiond {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* background-color: #282828; Dark background like Spotify */
+  color: black;
+  height : 80px ;
+  display: flex;
+  justify-content: center; /* Center all content horizontally */
+  align-items: center; /* Align content vertically */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
+  padding : 10px ;
+  background-color:#F5F5DC;
+}
+
+.song-image {
+  grid-column: 1; /* Place the song image in the first column */
+  justify-self: center; /* Center the image horizontally within its grid area */
+  height : 50px ;
+  width : 50px;
+  background-color: blue;
+}
+
+.current-song-details {
+  grid-column: 2; /* Place the song details in the second column */
+  display: flex;
+  flex-direction: column; /* Stack the song title and artist vertically */
+  justify-content: center; /* Vertically center the content */
+  align-items: center; /* Horizontally center the content */
+}
 
 
+
+.song-title, .artist-name {
+  text-align: center; /* Center the text for song title and artist name */
+  background-color: white;
+}
+
+.current-song-infoo{
+  height : 80px;
+  border-radius: 12px ;
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr 10fr; /* Three columns: 1 for image, 2 for details, 1 for buttons */
+  /* grid-template-rows: 80px; Adjust row height automatically */
+  gap: 20px; /* Optional gap between the columns */
+  background-color:#F7E7CE;
+  width : 85%;
+  align-items: center;
+}
+
+
+.current-song-buttons {
+  padding: 15px;
+  grid-column: 3; /* Place the buttons in the third column */
+  display: flex;
+  flex-direction: row; /* Arrange buttons horizontally */
+  justify-content: center; /* Center buttons horizontally */
+  align-items: center ;
+  gap: 10px; /* Space between the buttons */
+}
+
+.current-song-buttons button {
+  background-color: #333; /* Dark background */
+  color: #fff; /* White icon color */
+  border: none; /* Remove default button border */
+  border-radius: 50%; /* Make buttons circular */
+  width: 50px; /* Set width for circular buttons */
+  height: 50px; /* Set height for circular buttons */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px; /* Size of the icon */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: all 0.3s ease; /* Smooth hover transition */
+}
+
+.current-song-buttons button:hover {
+  background-color: #555; /* Change the background color on hover */
+}
+
+.current-song-buttons button:active {
+  transform: scale(0.95); /* Slightly reduce size on click */
+}
+
+.music-progress-bar {
+  grid-column : 4 ;
+  width: 400px;
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  height: 8px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  background-color: #1DB954; /* Spotify green color */
+  height: 100%;
+  border-radius: 5px;
+}
