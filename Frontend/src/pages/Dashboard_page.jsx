@@ -54,6 +54,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const clientID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
   const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
+  //Socket
+  const [socket, setSocket] = useState(null);
+
 
   // Miscellaneous
   const [loading, setLoading] = useState(true);
@@ -78,6 +81,62 @@ const Dashboard = () => {
     setRows(rows);
     }
   }, [totalTables]);
+
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const jwt = localStorage.getItem('jwt'); // Retrieve JWT token from localStorage
+      // console.log('JWT Token:', jwt);
+
+      if (!jwt) {
+        console.error('JWT token not found!');
+        return; // Handle this case accordingly (e.g., redirect to login)
+      }
+
+      const ws = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${jwt}`);
+
+      ws.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      ws.onmessage = (event) => {
+        //const data = JSON.parse(event.data);
+        console.log(event.data)
+        if (event.data === 'queue updated') {
+          
+          fetchQueue();
+  
+        }
+        if (event.data === 'current track updated') {
+          //fetchQueue();
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.warn('WebSocket connection closed:', event);
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        console.log('Retrying connection...');
+        setTimeout(() => {
+          const newWs = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${jwt}`);
+          setSocket(newWs);
+        }, 5000); // Retry after 5 seconds
+      };
+
+      setSocket(ws);
+
+      // Cleanup on component unmount
+      return () => {
+        ws.close();
+      };
+    }, 3000); // Delay of 5 seconds
+
+    // Cleanup the timeout if the component unmounts before the timeout completes
+    return () => clearTimeout(timeoutId);
+  }, []);
+
 
   
 

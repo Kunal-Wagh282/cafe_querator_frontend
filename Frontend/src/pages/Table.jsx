@@ -24,6 +24,8 @@ const Table = () => {
   const searchParams = new URLSearchParams(location.search);
   const cafeid = searchParams.get('id'); // Extract `code` query param
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null);
+
   
     useEffect(() => {
       setTimeout(() => {
@@ -42,6 +44,44 @@ const Table = () => {
     fetchQueue();
   }, []);
   
+
+
+  
+
+  useEffect(() => {
+    const cjwt = localStorage.getItem('cjwt'); // Retrieve JWT token from localStorage
+    if (!cjwt) {
+      console.error('CJWT token not found!');
+      return; // Handle this case accordingly (e.g., redirect to login)
+    }
+    const ws = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${cjwt}`);
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    ws.onmessage = (event) => {
+      //const data = JSON.parse(event.data);
+      console.log(event.data)
+      if (event.data === 'queue updated') {
+        fetchQueue();
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    setSocket(ws);
+
+    // Cleanup on component unmount
+    return () => {
+      ws.close();
+    };
+  }, []);
   
     
   const fetchToken = async () => {
