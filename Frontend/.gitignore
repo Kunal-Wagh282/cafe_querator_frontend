@@ -34,7 +34,7 @@ pyvenv.cfg
 # settings.py
 
 # If you have environment variables in a .env file
-
+.env
 
 # Django migrations
 **/migrations/*.py

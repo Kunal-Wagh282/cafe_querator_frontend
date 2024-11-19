@@ -114,9 +114,10 @@ const Dashboard = () => {
         if (event.data === 'current track updated') {
           //fetchQueue();
         }
-        if(event.data === 'Table Status updated')
-        {
-          updateTables();
+        if (event.data.startsWith('Table') && event.data.includes('Turned On')) {
+          const tableNumber = event.data.split(' ')[1];  // Extract table number
+          notify('info',`Table ${tableNumber} status on!!`)
+          updateTables();  // Update the specific table
         }
       };
 
@@ -486,7 +487,7 @@ const playSong = async (track_id) => {
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
         
-
+        console.log(selectedTrack);
         // Fetch the song features
         //const features = await fetchSongFeatures(trackId);
         //playSong(selectedTrack.id);
@@ -714,7 +715,7 @@ const playSong = async (track_id) => {
           
           // API call
           const handleTableClick = async (table) => {
-            console.log(`Table ${table} clicked!`);
+            //console.log(`Table ${table} clicked!`);
             
             setTableColors((prevColors) => {
               if (prevColors[table] === 'green') {
@@ -740,6 +741,7 @@ const playSong = async (track_id) => {
                 );
                 console.log('API response:', response.data);
                 notify('success',`Table ${table} status off!`)
+                fetchQueue();
 
               } catch (error) {
                 console.error('Error during API call:', error);
@@ -946,6 +948,8 @@ const playSong = async (track_id) => {
                         <span className="track-name">{track.track_name}</span>
                         {/* Display artist name dynamically */}
                         <span className="artist-name">{track.track_artist_name}</span>
+                        <br></br>
+                        <span className="">({track.id === 0 ? 'Table Admin' : `Table ${track.id}`})</span>
                       </div>
                     </li>
                   ))
