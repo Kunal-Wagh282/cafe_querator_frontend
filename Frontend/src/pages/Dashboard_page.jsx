@@ -878,22 +878,22 @@ const playSong = async (track_id,nowSongname) => {
             onClick={playNextSong}
             disabled={isButtonDisabled}
             style={{
-              backgroundColor: isButtonDisabled ? '#F5F5DC' : '#F5F5DC', // Change color when disabled
+              backgroundColor: isButtonDisabled ? '#F5F5DC' : '', // Change color when disabled
               color: isButtonDisabled ? '#a1a1a1' : 'black', // Text color when disabled
-              cursor: isButtonDisabled ? 'not-allowed' : 'pointer', // Change cursor when disabled
+              cursor: isButtonDisabled ? 'not-allowed' : 'pointer', // Change cursor when disabled 
             }}>
             Start Vibe
           </button>
           <button className="sidebar-btn" onClick={handleLogout}>Logout</button>
           </div>
-            <div className="requested-song">
+            <div className="queue">
                                       <h2>Requested Songs:</h2>
-                            <div className="requested-queue-section">
-                            <div className="requested-queue">
-                              <ul>
+                            {/* <div className="requested-queue-section"> */}
+                              
+                                <ul className='queue-list'>          
                                 {requestedSongs.length > 0 ? (
                                   requestedSongs.map((selectedTrack, index) => (
-                                    <li key={index} className="queue-item">
+                                    <li key={index} className="queue-item-d">
                                       {/* Display song image dynamically */}
                                       <img 
                                         src={selectedTrack.album.images[0]?.url || 'https://placeholder.com/150'} // Use dynamic image URL
@@ -916,13 +916,13 @@ const playSong = async (track_id,nowSongname) => {
                                           className="accept-btn" 
                                           onClick={() => handleAccept(selectedTrack.name)}
                                         >
-                                          Accept
+                                          ✔
                                         </button>
                                         <button 
                                           className="deny-btn" 
                                           onClick={() => handleRemove(selectedTrack.name)}
                                         >
-                                          Remove
+                                          X
                                         </button>
                                       </div>
                                     </li>
@@ -931,8 +931,8 @@ const playSong = async (track_id,nowSongname) => {
                                   <p className="no-rejected-songs"> </p>
                                 )}
                               </ul>
-                            </div>
-                            </div>
+                            
+                            {/* </div> */}
         </div> 
 
 
