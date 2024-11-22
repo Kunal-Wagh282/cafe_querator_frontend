@@ -1000,17 +1000,18 @@ const playSong = async (track_id,nowSongname) => {
           </div>
               
           <div className="current-song-infoo">
-                  <div className="song-image-detail">
-                      <div className="song-image">
-                        <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
-                      </div>
+                  <div>
+                        <div className="song-image-detail">
+                            <div className="song-image">
+                              <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+                            </div>
 
-                      <div className="current-song-details"> 
-                        <p className="song-title">{songName || 'Song Title'}</p>
-                        <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
-                      </div>
-                  </div>
-                  
+                            <div className="current-song-details"> 
+                              <p className="song-title">{songName || 'Song Title'}</p>
+                              <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
+                            </div>
+                        </div>
+                  </div>  
                   <div className="current-song-buttons">
                     <button ><FontAwesomeIcon icon={faBackward} /></button>
                     <button onClick={handlePlayPause}>{isPaused ? (<FontAwesomeIcon icon={faPlay} />) : (<FontAwesomeIcon icon={faPause} />)}</button>
