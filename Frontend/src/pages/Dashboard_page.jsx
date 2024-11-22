@@ -5,11 +5,13 @@ import '../styles/Dashboard.css'; // Add your styles here
 import CONFIG from '../config'; // Import the API URL
 import Preloader from '../components/Prealoader';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause, faForward ,faBackward} from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPause, faForward ,faBackward,faCog} from "@fortawesome/free-solid-svg-icons";
 import tableImage from '../images/table.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 import SpotifyPlayerWithProgress from '../components/SpotifyPlayerWithProgress';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 const Dashboard = () => {
   // State variables
   // Authentication and Tokens
@@ -820,12 +822,14 @@ const playSong = async (track_id,nowSongname) => {
         {loading ? (
         <Preloader /> // Show the preloader
       ) : (<></>)}
-      {/* <header className="dashboard-header">
+      <header className="dashboard-header">
         <div className="heading">
             <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
             Let's change the vibe today!
+
+          
         </div>
-      </header> */}
+      </header>
       <ToastContainer />
 
       <div className="dashboard-content">
@@ -852,6 +856,7 @@ const playSong = async (track_id,nowSongname) => {
             placeholder = "search your playlist"
             value = {playlistQuery}
             onChange = {handlePlaylistInputChange}
+            className='playlist-search'
           />
           
 
