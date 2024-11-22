@@ -8,7 +8,6 @@ import './App.css';
 import Table from './pages/Table';
 import Landing from './pages/Landing';
 import Outh from './pages/Outh';
-import Socket from './pages/Socket';
 function App() {
   return (
     <Router>
@@ -21,7 +20,6 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} /> 
         <Route path="/:cafename/table/:tableid" element={<Table/>} /> {/* http://localhost:5173/B/table/9?id=36 */}
         <Route path="/outh" element={<Outh/>} /> 
-        <Route path="/socket" element={<Socket/>} /> 
 
 
 

@@ -235,7 +235,6 @@
   justify-self: left; /* Center the image horizontally within its grid area */
   height : 80px ;
   width : 80px;
-  background-color: blue;
   border-radius:5px;
   flex-direction: column ;
 
@@ -324,11 +323,11 @@
   margin-top: 10px;
 }
 
-.progress-bar {
-  background-color: #1DB954; /* Spotify green color */
+/* .progress-bar {
+  background-color: #1DB954; 
   height: 100%;
   border-radius: 5px;
-}
+}  */
 
 .current-heading{
   display : flex ;
@@ -361,4 +360,35 @@
 .indi-table{
   position: absolute;
 
+}
+
+
+.progress-bar input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%; /* Full width */
+  height: 8px; /* Adjust thickness */
+  background: #ddd; /* Background color */
+  border-radius: 4px;
+  outline: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.progress-bar input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px; /* Thumb size */
+  height: 16px;
+  background: #1db954; /* Spotify green */
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.progress-bar input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #1db954;
+  border-radius: 50%;
+  cursor: pointer;
 }

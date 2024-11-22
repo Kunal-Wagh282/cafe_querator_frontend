@@ -9,7 +9,7 @@ import { faPlay, faPause, faForward ,faBackward} from "@fortawesome/free-solid-s
 import tableImage from '../images/table.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
-
+import SpotifyPlayerWithProgress from '../components/SpotifyPlayerWithProgress';
 
 const Dashboard = () => {
   // State variables
@@ -31,7 +31,7 @@ const Dashboard = () => {
   const [trackId, setTrackid] = useState(""); // For search input
   const [songName, setSongname] = useState(""); // For search input
   const [track_artist_name, setTrack_Artist_Name] = useState(""); // For search input
-  const [track_img_url, setTrack_Image_Url] = useState(""); // For search input
+  const [track_img_url, setTrack_Image_Url] = useState("https://placeholder.com/150"); // For search input
 
 
   // table number const
@@ -63,6 +63,9 @@ const Dashboard = () => {
   //Socket
   const [socket, setSocket] = useState(null);
 
+    const [duration, setDuration] = useState(0); // Total duration in ms
+    const [position, setPosition] = useState(0); // Current position in ms
+    const [intervalId, setIntervalId] = useState(null);
 
   // Miscellaneous
   const [loading, setLoading] = useState(true);
@@ -154,26 +157,19 @@ const Dashboard = () => {
   const playNextSong = async () => {
     try {
       // Fetch the next track from the API
-      const response = await axios.get(`${CONFIG.QUEUE_URL}/next-track`, {
+
+      const response = await axios.get(`${CONFIG.QUEUE_URL}/get-queue`, {
         headers: {
           "Authorization": `Bearer ${jwt}`, // Pass the access token if required
         }
       });
-
-
-      if (response.status === 200 && response.data.Next_track) 
+      //console.log(response.data.Queue)
+      if (response.status === 200 && response.data.Queue[0]) 
       {
-        const data = response.data.Next_track;
-        console.log(data.track_id);
-  
-        // Update the state with the next track details
-        setSongname(data.track_name);
-        setTrackid(data.track_id);
-        setTrack_Artist_Name(data.track_artist_name);
-        setTrack_Image_Url(data.track_img_url);
-  
+        const data = response.data.Queue[0];
+        //console.log(data.track_id);
         // Play the next track
-        playSong(data.track_id); // Call your existing playSong function
+        playSong(data.track_id,data.track_name); // Call your existing playSong function
 
         // If needed, send a POST request to notify the backend that the track has been played
         
@@ -195,11 +191,18 @@ const Dashboard = () => {
         
       } 
       else {
-        console.log("No next track available.");
+        console.log("Selected playlist over!");
+        alert("Select a playlist!")
       }
     } catch (error) {
-      console.log(error);
-      //alert("No Songs in the Queue!")
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+      } else {
+        console.error("Error message:", error.message);
+      }
+      notify("warning","No Songs in Queue!")
     }
   };
   
@@ -224,50 +227,79 @@ const Dashboard = () => {
           localStorage.setItem("device_id",device_id)
         });
   
-        spotifyPlayer.addListener('player_state_changed', state => {
-          if (state) {
-              setTrackName(state.track_window.current_track.name);
-              setArtistName(
-                  state.track_window.current_track.artists.map(artist => artist.name).join(', ')
-              );
-              setIsPaused(state.paused);
-      
-              const endTimeoutDelay = state.duration - state.position - 5000; // Pause before 5 seconds of song ends
-              const waitDelay = 5 * 1000; // Wait 5 seconds before skipping
-              const resumeTimeoutDelay = endTimeoutDelay + waitDelay;
-      
-              // Clear existing timeouts if they exist
-              if (window.spotifyTimeout1) {
-                  clearTimeout(window.spotifyTimeout1);
-              }
-              if (window.spotifyTimeout2) {
-                  clearTimeout(window.spotifyTimeout2);
-              }
-      
-              // Set a timeout to pause the song 5 seconds before it ends
-              window.spotifyTimeout1 = setTimeout(() => {
-                  console.log('Song Ended');
-                  window.spotify_player && window.spotify_player.pause();
-                  console.log('Waiting 5 Seconds...');
-                  // Call playNextSong after the song has ended and 5 seconds have passed
-                  playNextSong();
-              }, endTimeoutDelay);
-      
-              // Set a timeout to skip the song after waiting 5 seconds
-              window.spotifyTimeout2 = setTimeout(() => {
-                  console.log('Resuming Song...');
-                  window.spotify_player && window.spotify_player.nextTrack();
-              }, resumeTimeoutDelay);
-          }
-      });
-
-      
-      
+      spotifyPlayer.addListener('player_state_changed', (state) => {
+        if (state) {
+            // Update UI state
+            setTrackName(state.track_window.current_track.name);
+            setArtistName(
+                state.track_window.current_track.artists.map((artist) => artist.name).join(', ')
+            );
+            setIsPaused(state.paused);
+    
+            // Clear existing timeouts
+            if (window.spotifyTimeout1) {
+                clearTimeout(window.spotifyTimeout1);
+            }
+            if (window.spotifyTimeout2) {
+                clearTimeout(window.spotifyTimeout2);
+            }
+    
+            // Only set timeouts if the track is playing
+            if (!state.paused) {
+                const endTimeoutDelay = Math.max(0, state.duration - state.position - 5000); // Ensure non-negative delay
+                const resumeTimeoutDelay = endTimeoutDelay + 5000;
+    
+                // Timeout to handle end-of-track pause
+                window.spotifyTimeout1 = setTimeout(() => {
+                    console.log('Song ended. Pausing playback...');
+                    window.spotify_player && window.spotify_player.pause();
+                    console.log('Waiting 5 seconds...');
+                    playNextSong(); // Call your function to handle the next song
+                }, endTimeoutDelay);
+    
+                // Timeout to skip the track after waiting 5 seconds
+                window.spotifyTimeout2 = setTimeout(() => {
+                    console.log('Skipping to next track...');
+                    window.spotify_player && window.spotify_player.nextTrack();
+                }, resumeTimeoutDelay);
+            }
+        }
+    });
+  
+        
         spotifyPlayer.connect();
         setPlayer(spotifyPlayer);
       };
     }
   }, [accessToken]);
+
+
+  const startProgressInterval = (currentPosition, totalDuration) => {
+    clearProgressInterval(); // Clear any existing interval
+    const id = setInterval(() => {
+        setPosition((prevPosition) => {
+            const newPosition = prevPosition + 1000; // Update by 1 second
+            return newPosition >= totalDuration ? totalDuration : newPosition;
+        });
+    }, 1000);
+    setIntervalId(id);
+};
+
+const clearProgressInterval = () => {
+  if (intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+  }
+};
+
+const handleSeek = (newPosition) => {
+  if (player) {
+      player.seek(newPosition).catch((error) => {
+          console.error('Error seeking:', error);
+      });
+      setPosition(newPosition);
+  }
+};
   
 
   useEffect(() => {
@@ -344,8 +376,15 @@ const Dashboard = () => {
   
 
   const handlePlayPause = () => {
-    player.togglePlay();
-  };
+    if (player) {
+        player.togglePlay().catch((error) => {
+            console.error('Error toggling play/pause:', error);
+        });
+    } else {
+        console.error('Player is not initialized.');
+    }
+};
+
 
   // Function to send token data to the backend
   const sendTokenToBackend = async (accessToken, refreshToken, expiresAt) => {
@@ -441,7 +480,7 @@ const Dashboard = () => {
   };
 
 // Function to fetch song features by track ID
-const playSong = async (track_id) => {
+const playSong = async (track_id,nowSongname) => {
   if (!accessToken) return null;
 
   const endpoint = `https://api.spotify.com/v1/audio-features/${track_id}`;
@@ -452,6 +491,13 @@ const playSong = async (track_id) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    //console.log(response.data)
+    const results = await searchSongs(nowSongname);
+    const selectedTrack = results[0]; // Assuming the first result is what the user meant
+    setSongname(selectedTrack.name);
+    setTrack_Artist_Name(selectedTrack.artists[0]?.name || 'Unknown Artist');
+    setTrackid(selectedTrack.id);
+    setTrack_Image_Url(selectedTrack.album?.images[0]?.url || 'https://placeholder.com/150');
 
     const songUri = response.data.uri; // Get the song URI from the response
     const deviceId=localStorage.getItem("device_id");
@@ -487,13 +533,12 @@ const playSong = async (track_id) => {
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
         
-        console.log(selectedTrack);
+        //console.log(selectedTrack);
         // Fetch the song features
         //const features = await fetchSongFeatures(trackId);
         //playSong(selectedTrack.id);
         try {
-          const response = await axios.post(
-            `${CONFIG.QUEUE_URL}/add-track`,
+          const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
             {
               track_name: selectedTrack.name,
               track_id: selectedTrack.id,
@@ -510,6 +555,9 @@ const playSong = async (track_id) => {
           if (response.status === 200) {
             fetchQueue(); // Refresh queue
             setSearchQuery('');
+          }
+          if (response.status === 226) {
+            notify("info","Song Already in Queue!!");
           }
         } catch (error) {
           console.error('Error adding song:', error);
@@ -559,7 +607,6 @@ const playSong = async (track_id) => {
       const results = await searchPlaylists(playlistQuery);
       if (results.length > 0) {
         setSelectedPlaylist(results[0]);
-
       }
     }
   };
@@ -571,11 +618,18 @@ const playSong = async (track_id) => {
   };
   
   const handlePlaylistSuggestionClick = async (playlist) => {
-    setPlaylistQuery(playlist.name);
+    console.log(playlist.tracks.total)
+    if(playlist.tracks.total < 8){
+      alert("Playlist should contain atleast 10 songs!")
+      setPlaylistQuery('');
+      setPlaylistSuggestions([]);
+      return
+    }
+    setPlaylistQuery('');
     setSelectedPlaylist(playlist);
     setSelectedPlaylistID(playlist.id)
     setPlaylistSuggestions([]);
-    console.log("name : ",playlist.name,"id : ",playlist.id)
+    console.log("Selected playist : ",playlist.name)
 
     const playlistData = {
       playlist_name: playlist.name,
@@ -594,6 +648,10 @@ const playSong = async (track_id) => {
         }
       );
       console.log('Playlist data sent successfully:', response.data);
+      if(response.data.message === "Playlist vector updated successfully")
+      {
+        notify("success",`Playlist: ${playlist.name} selected`)
+      }
           } catch (error) {
               console.error('Error sending playlist data to backend:', error);
           }
@@ -883,7 +941,7 @@ const playSong = async (track_id) => {
                     <div className='indi-table'>
                       {table}
                     </div>  
-                      <img src={tableImage} alt="Cafe Illustration" class="Image"/>
+                      <img src={tableImage} alt="Cafe Illustration" className="Image"/>
                     </div>
                   ))}
                 </div>
@@ -935,7 +993,8 @@ const playSong = async (track_id) => {
             <div className="queue">
               <ul className="queue-list">
                 {queue.length > 0 ? (
-                  queue.map((track, index) => (
+                  queue.filter(track => track.id !== -1) // Filter out tracks with id -1
+                  .map((track, index) => (
                     <li key={index} className="queue-item">
                       {/* Display song image dynamically */}
                       <img 
@@ -984,11 +1043,9 @@ const playSong = async (track_id) => {
               <button onClick={handlePlayPause}>{isPaused ? (<FontAwesomeIcon icon={faPlay} />) : (<FontAwesomeIcon icon={faPause} />)}</button>
               <button onClick={playNextSong}><FontAwesomeIcon icon={faForward} /></button>
             </div>
-            <div className="music-progress-bar">
-              
-            </div>
-            
           </div>
+          <SpotifyPlayerWithProgress player={player} />
+
         </div>
     </div>
 
