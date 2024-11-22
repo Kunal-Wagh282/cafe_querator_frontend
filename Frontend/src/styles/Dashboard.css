@@ -239,7 +239,12 @@
   align-items: center;
   gap: 10px;
   left: 0;
+  flex-direction: row;
 
+}
+.current-song-infoo{
+  display: flex;
+  flex-direction: column;
 }
 
 /* Song image styling */
