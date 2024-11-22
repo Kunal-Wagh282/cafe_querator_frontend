@@ -19,6 +19,8 @@ const Table = () => {
   const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
   const [searchResults, setSearchResults] = useState([]); // To store search results
   const [songName, setSongname] = useState(""); // For search input
+  const [requestsongName, setRequestSongname] = useState(""); // For search input
+
   const [track_artist_name, setTrack_Artist_Name] = useState(""); // For search input
   const [track_img_url, setTrack_Image_Url] = useState("https://placeholder.com/150"); // For search input
   const [trackId, setTrackid] = useState(""); // For search input
@@ -146,7 +148,6 @@ const Table = () => {
       if(response.status === 200){
       setAccessToken(response.data.access_token);
       return response.data.access_token
-      console.log("Access Token Set!")
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -243,6 +244,7 @@ const Table = () => {
         const results = await searchSongs(searchQuery,accessToken);
         if (results.length > 0) {
           const selectedTrack = results[0];
+          setRequestSongname(selectedTrack.name);
           const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
             {
               track_name: selectedTrack.name,
@@ -325,8 +327,8 @@ const Table = () => {
     };
   
     const handleRequest = () => {
-      console.log('Song requested to the admin!',songName); // Your logic here
-      sendMessage(`Song requested ${songName}`)
+      console.log('Song requested to the admin!',requestsongName); // Your logic here
+      sendMessage(`Song requested ${requestsongName}`)
       closeModal();
     };
     
@@ -345,7 +347,6 @@ const Table = () => {
       {loading ? (
         <Preloader /> // Show the preloader
       ) : (null)}
-      
     <Navbar cafeName={cafename}/>
       {/* Search Bar */}
       
@@ -390,14 +391,14 @@ const Table = () => {
         onClose={closeModal}
         onConfirm={handleRequest}
         title="Request Song"
-        message={`Do you want to request ${songName} song to the admin?`}
+        message={`Do you want to request ${requestsongName} song to the admin?`}
       />
       ) : (
       null
       )}
 
 {/* Queue Section */}
-<div className="table-queue">
+<div className="queue">
   <h2 className="queue-header">Ongoing Queue</h2>
   <ul className="queue-list">
     {queue.length > 0 ? (
@@ -425,7 +426,7 @@ const Table = () => {
 </div>
 
       {/* Current Song Section */}
-  <div className="table-current-song-section">
+  <div className="current-song-section">
     <h3>Now Playing</h3>
     <div className="current-song-info">
       {/* Display the album art dynamically */}

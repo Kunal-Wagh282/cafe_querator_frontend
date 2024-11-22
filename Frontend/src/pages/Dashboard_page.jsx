@@ -1149,7 +1149,7 @@ const playSong = async (track_id,nowSongname) => {
                             </div>
 
                             <div className="current-song-details"> 
-                              <p className="song-title">{songName || 'Song Title'}</p>
+                              <p className="current-song-title">{songName || 'Song Title'}</p>
                               <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
                             </div>
                         </div>
