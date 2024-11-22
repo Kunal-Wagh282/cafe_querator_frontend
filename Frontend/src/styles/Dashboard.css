@@ -183,17 +183,47 @@
   align-items: center;
 }
 
-.queue{
-
-  width : 80% ;
-  background-color: #dede95;
-  /* justify-content: center; */
-
+.queue {
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  max-height: 400px;
+  overflow-y: auto; /* Enable scrolling for long lists */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.queue-list{
-  background-color: #dede95;
-  height : 85%;
+/* Styling for the list container */
+.queue-list {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0;
+  margin: 0;
+}
+
+/* Individual queue item styling */
+.queue-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 5px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.queue-item:hover {
+  background-color: #f0f8ff; /* Light blue hover effect */
+  transform: scale(1.02); /* Slightly enlarge on hover */
+}
+
+/* Styling for the song image */
+.track-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  object-fit: cover; /* Ensures the image maintains its aspect ratio */
 }
 
 /* Optional music player styling */
