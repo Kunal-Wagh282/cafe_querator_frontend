@@ -10,7 +10,6 @@ import tableImage from '../images/table.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 import SpotifyPlayerWithProgress from '../components/SpotifyPlayerWithProgress';
-
 const Dashboard = () => {
   // State variables
   // Authentication and Tokens
@@ -283,9 +282,7 @@ const Dashboard = () => {
       if (isAccessTokenExpired(expiresAt)) {
         console.log("Access token is expired. Attempting to refresh...");
         refreshAccessToken(); // Call a function to refresh the token
-      } else {
-        console.log("Access token is still valid.");
-      }
+      } 
     }, 5000); // Check every 5 seconds
   
     return () => clearInterval(intervalId); // Cleanup on unmount
@@ -513,7 +510,6 @@ const playSong = async (track_id,nowSongname) => {
       const results = await searchSongs(searchQuery);
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
-        
   
         try {
           const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
@@ -535,6 +531,7 @@ const playSong = async (track_id,nowSongname) => {
             setSearchQuery('');
           }
           if (response.status === 226) {
+            setSearchQuery('')
             notify("info","Song Already in Queue!!");
           }
         } catch (error) {

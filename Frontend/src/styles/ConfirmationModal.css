@@ -1,0 +1,15 @@
+/* Add to your main CSS file */
+.request-song-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .request-song-btn:hover {
+    background-color: #0056b3;
+  }
+  
