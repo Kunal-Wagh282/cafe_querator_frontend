@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar'; // Import the Navbar component
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 import Preloader from '../components/Prealoader';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 
 const Table = () => {
@@ -18,6 +19,8 @@ const Table = () => {
   const [suggestions, setSuggestions] = useState([]); // To hold live suggestions
   const [searchResults, setSearchResults] = useState([]); // To store search results
   const [songName, setSongname] = useState(""); // For search input
+  const [track_artist_name, setTrack_Artist_Name] = useState(""); // For search input
+  const [track_img_url, setTrack_Image_Url] = useState("https://placeholder.com/150"); // For search input
   const [trackId, setTrackid] = useState(""); // For search input
   const [queue, setQueue] = useState([]);
   // Use URLSearchParams to parse the query string
@@ -25,6 +28,9 @@ const Table = () => {
   const cafeid = searchParams.get('id'); // Extract `code` query param
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
+  //const [results, setResults] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+
 
   
     useEffect(() => {
@@ -37,7 +43,11 @@ const Table = () => {
     // Fetch JWT token once the component mounts
     setJwtToken()
     .then(() => {
-      fetchToken()}) // Call the token fetch function
+      fetchToken()
+      .then((token) => {
+        updateCurrentSong(token)
+      })
+    }) // Call the token fetch function
   }, [tableid]); // Re-run if cafeId changes
 
   useEffect(() => {
@@ -45,6 +55,7 @@ const Table = () => {
   }, []);
   
 
+  
 
   
 
@@ -71,7 +82,7 @@ const Table = () => {
           fetchQueue();
         }
         if (event.data === 'current track updated') {
-          updateCurrentSong();
+          updateCurrentSong(accessToken);
           console.log("Change song")
         }
         
@@ -102,21 +113,27 @@ const Table = () => {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const updateCurrentSong = async () => {
+  const updateCurrentSong = async (token) => {
     try {
       const response = await axios.get(`${CONFIG.QUEUE_URL}/current-track`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
         },
       });
-      console.log(response)
       if(response.status === 200){
-      
+        const data = response.data.current_track        
+      const results = await searchSongs(data.track_name,token); // Await results
+      const selectedTrack = results[0];
+      setSongname(selectedTrack.name);
+      setTrack_Artist_Name(selectedTrack.artists[0]?.name || 'Unknown Artist');
+      setTrack_Image_Url(selectedTrack.album?.images[0]?.url || 'https://placeholder.com/150');
       }
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
+
+  
 
     
   const fetchToken = async () => {
@@ -128,6 +145,7 @@ const Table = () => {
       });
       if(response.status === 200){
       setAccessToken(response.data.access_token);
+      return response.data.access_token
       console.log("Access Token Set!")
       }
     } catch (error) {
@@ -164,25 +182,6 @@ const Table = () => {
 
   };
 
-  const fetchSongFeatures = async (trackId) => {
-    if (!accessToken) return null;
-  
-    const endpoint = `https://api.spotify.com/v1/audio-features/${trackId}`;
-  
-    try {
-      const response = await axios.get(endpoint, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      // setUri(response.data.uri);
-  
-      return response.data; // Return song features
-    } catch (error) {
-      console.error('Error fetching song features:', error);
-      return null; // Return null on error
-    }
-  };
   
 
 
@@ -199,14 +198,12 @@ const Table = () => {
         setSuggestions([]);
         return;
       }
-  
-      const results = await searchSongs(query); // Await results
+      const results = await searchSongs(query,accessToken); // Await results
       setSuggestions(results); // Store search results as suggestions
     };
 
-    const searchSongs = async (query) => {
+    const searchSongs = async (query,accessToken) => {
       if (!accessToken) return [];
-  
       const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
   
       try {
@@ -233,7 +230,6 @@ const Table = () => {
         });
         if (response.status === 200) {
           setQueue(response.data.Queue); // Assuming the backend response contains a 'queue' array
-          console.log('Queue fetched:', response.data);
         }
       } catch (error) {
         console.error('Error fetching queue:', error);
@@ -244,7 +240,7 @@ const Table = () => {
 
     const addTrack = async () => {
       try {
-        const results = await searchSongs(searchQuery);
+        const results = await searchSongs(searchQuery,accessToken);
         if (results.length > 0) {
           const selectedTrack = results[0];
           setSongname(selectedTrack.name);
@@ -280,6 +276,7 @@ const Table = () => {
         }
         if(error.response.data.message === "Vibe not match"){
           console.log(error)
+          openModal();
           notify("error","Vibe does not match, try another song!!")
           return
         }
@@ -318,14 +315,37 @@ const Table = () => {
           break;
       }
     };
+
+
+    const openModal = () => {
+      setIsModalOpen(true);
+    };
+  
+    const closeModal = () => {
+      setIsModalOpen(false);
+    };
+  
+    const handleRequest = () => {
+      console.log('Song requested to the admin!',songName); // Your logic here
+      sendMessage(`Song requested ${songName}`)
+      closeModal();
+    };
     
+    const sendMessage = (message) => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+        console.log('Message sent:', message);
+      } else {
+        console.error('WebSocket is not open');
+      }
+    };
 
 
   return (
     <div className="table-container">
       {loading ? (
         <Preloader /> // Show the preloader
-      ) : (<></>)}
+      ) : (null)}
     <Navbar cafeName={cafename}/>
       {/* Search Bar */}
       
@@ -363,6 +383,19 @@ const Table = () => {
 )}
 
 
+
+{isModalOpen ? (
+        <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={handleRequest}
+        title="Request Song"
+        message={`Do you want to request ${songName} song to the admin?`}
+      />
+      ) : (
+      null
+      )}
+
 {/* Queue Section */}
 <div className="queue">
   <h2 className="queue-header">Ongoing Queue</h2>
@@ -396,12 +429,12 @@ const Table = () => {
     <h3>Now Playing</h3>
     <div className="current-song-info">
       {/* Display the album art dynamically */}
-      <img src={queue[0]?.track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+      <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
       <div className="current-song-details">
         {/* Display the current song name dynamically */}
-        <p className="song-title">{queue[0]?.track_name || 'Song Title'}</p>
+        <p className="song-title">{songName || 'Song Title'}</p>
         {/* Display the artist name dynamically */}
-        <p className="artist-name">{queue[0]?.track_artist_name || 'Artist Name'}</p>
+        <p className="artist-name">{track_artist_name || 'Artist Name'}</p>
       </div>
       </div>
   </div>

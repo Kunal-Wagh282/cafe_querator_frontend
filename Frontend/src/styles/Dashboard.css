@@ -182,17 +182,22 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   align-items: center;
 }
-
 .queue{
+<<<<<<< HEAD
   padding-left : 10px ; 
+=======
+>>>>>>> d5171728c369878cb439b7701e189ec1bcb0797e
   width : 80% ;
   background-color: purple;
   /* justify-content: center; */
-
 }
-
 .queue-list{
+<<<<<<< HEAD
   height : 85%;
+=======
+  background-color: #dede95;
+  
+>>>>>>> d5171728c369878cb439b7701e189ec1bcb0797e
 }
 
 /* Optional music player styling */

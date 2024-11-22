@@ -10,7 +10,6 @@ import tableImage from '../images/table.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';  // Import Toastify CSS
 import SpotifyPlayerWithProgress from '../components/SpotifyPlayerWithProgress';
-
 const Dashboard = () => {
   // State variables
   // Authentication and Tokens
@@ -283,9 +282,7 @@ const Dashboard = () => {
       if (isAccessTokenExpired(expiresAt)) {
         console.log("Access token is expired. Attempting to refresh...");
         refreshAccessToken(); // Call a function to refresh the token
-      } else {
-        console.log("Access token is still valid.");
-      }
+      } 
     }, 5000); // Check every 5 seconds
   
     return () => clearInterval(intervalId); // Cleanup on unmount
@@ -508,12 +505,11 @@ const playSong = async (track_id,nowSongname) => {
 
 
   // Handle search form submission
-  const handleSearchSubmit = async () => {
+  const handleSearchSubmit = async (searchQuery) => {
     if (searchQuery) {
       const results = await searchSongs(searchQuery);
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
-        
   
         try {
           const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
@@ -535,6 +531,7 @@ const playSong = async (track_id,nowSongname) => {
             setSearchQuery('');
           }
           if (response.status === 226) {
+            setSearchQuery('')
             notify("info","Song Already in Queue!!");
           }
         } catch (error) {
@@ -568,14 +565,14 @@ const playSong = async (track_id,nowSongname) => {
 
   const handleSuggestionClick = (track) => {
     // Set the input value to the selected track's name
-    setSearchQuery(track.name);
+    setSearchQuery('');
   
     // Clear the suggestions dropdown
     setSuggestions([]);
   
     // Optionally, clear the search results if you are displaying them somewhere else
     setSearchResults([]);
-    handleSearchSubmit();
+    handleSearchSubmit(track.name);
   };
   
  
@@ -606,12 +603,10 @@ const playSong = async (track_id,nowSongname) => {
 
      try {
       // Call the POST API
-      const response = await axios.post(`${CONFIG.API_URL}/setplaylistvector`, playlistData,
-
+      const response = await axios.post(`${CONFIG.QUEUE_URL}/setplaylistvector`, playlistData,
         {
           headers: {
             'Authorization': `Bearer ${jwt}`,
-            'Content-Type': 'application/json', // Specify content type
           }
         }
       );
@@ -920,6 +915,7 @@ const playSong = async (track_id,nowSongname) => {
             placeholder="Type something..."
             class="ui-input"
             type="text"
+            value={searchQuery}
             onChange={handleSearchInputChange}
           />
           {suggestions.length > 0 && (
