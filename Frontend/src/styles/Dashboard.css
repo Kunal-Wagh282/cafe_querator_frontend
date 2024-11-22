@@ -189,13 +189,9 @@
 .queue{
   padding-left : 10px ; 
   width : 80% ;
-  background-color: purple;
   /* justify-content: center; */
 }
-.queue-list{
-  /* background-color: #dede95; */
-  
-}
+
 
 /* Optional music player styling */
 .music-player {
@@ -485,11 +481,11 @@
   flex: 1;
 }
 
-.song-title {
+/* .rejected-song-title {
   font-weight: bold;
   font-size: 16px;
   color: #333;
-}
+} */
 
 .song-artist {
   font-size: 14px;

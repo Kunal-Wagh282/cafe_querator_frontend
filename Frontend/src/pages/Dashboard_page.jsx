@@ -1070,9 +1070,9 @@ const playSong = async (track_id,nowSongname) => {
 
 
             <h2>Rejected Songs:</h2>
-<div className="queue-section">
-<div className="queue">
-  <ul className="queue-list">
+<div className="requested-queue-section">
+<div className="requested-queue">
+  <ul>
     {requestedSongs.length > 0 ? (
       requestedSongs.map((selectedTrack, index) => (
         <li key={index} className="queue-item">
@@ -1115,13 +1115,8 @@ const playSong = async (track_id,nowSongname) => {
   </ul>
 </div>
 </div>
-
-
-
-
-
-          </div>   
-      </div>
+</div>   
+</div>
 
 
       {/* Current Song Section */}
