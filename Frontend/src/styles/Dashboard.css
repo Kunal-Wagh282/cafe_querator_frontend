@@ -146,7 +146,7 @@
 
 /* Sidebar buttons */
 .sidebar-btn {
-  background-color: #F5F5DC;
+  /* background-color: #F5F5DC; */
   color: black;
   padding: 10px 20px;
   margin-bottom: 10px;
@@ -179,51 +179,20 @@
   display: flex;
   flex-direction: column;
   border-radius: 8px; /* Rounded corners for visual distinction */
-  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); Subtle shadow for depth */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   align-items: center;
 }
 
-.queue {
-  padding: 1rem;
-  background-color: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  max-height: 400px;
-  overflow-y: auto; /* Enable scrolling for long lists */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.queue{
+  padding-left : 10px ; 
+  width : 80% ;
+  background-color: purple;
+  /* justify-content: center; */
+
 }
 
-/* Styling for the list container */
-.queue-list {
-  list-style-type: none; /* Remove bullet points */
-  padding: 0;
-  margin: 0;
-}
-
-/* Individual queue item styling */
-.queue-item {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  background-color: #ffffff;
-  border: 1px solid #dcdcdc;
-  border-radius: 5px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.queue-item:hover {
-  background-color: #f0f8ff; /* Light blue hover effect */
-  transform: scale(1.02); /* Slightly enlarge on hover */
-}
-
-/* Styling for the song image */
-.track-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
-  margin-right: 0.75rem;
-  object-fit: cover; /* Ensures the image maintains its aspect ratio */
+.queue-list{
+  height : 85%;
 }
 
 /* Optional music player styling */
@@ -244,7 +213,7 @@
 /* Suggestions dropdown styling */
 .suggestions {
   border: 1px solid #ccc; /* Border to distinguish suggestions */
-  background-color: #dede95; /* Background color for the dropdown */
+  background-color: #fff; /* Background color for the dropdown */
   position: absolute; /* Position it absolutely below the input */
   z-index: 10; /* Ensure it appears above other elements */
   width: 25vh; /* Match the width of the input */
@@ -268,13 +237,13 @@
 }
 
 .suggestions li:hover {
-  background-color: #dede95; /* Highlight suggestion on hover */
+  background-color: #f0f0f0; /* Highlight suggestion on hover */
 }
 
 
 .set-vibe {
-
-  background-color: #dede95; /* Light background for distinction */
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for distinction */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   margin-bottom: 20px; /* Space below the section */
@@ -381,7 +350,7 @@
 .song-title {
   font-size: 14px;
   font-weight: bold;
-  color: #dede95;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -474,80 +443,4 @@
   position: absolute;
 
 }
-
-
-/* Playlist dropdown container */
-.playlist-suggestions {
-  border: 1px solid #ccc; /* Light border for separation */
-  background-color: #fff; /* Clean white background */
-  z-index: 10; /* Ensure it appears above other elements */
-  width: 100%; /* Make it span the full width of the parent */
-  margin-top: 5px; /* Space between input and dropdown */
-  border-radius: 4px; /* Rounded corners */
-  max-height: 250px; /* Limit dropdown height */
-  overflow-y: auto; /* Enable scrolling for overflow */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for visibility */
-}
-
-/* Remove default list styles */
-.playlist-suggestions ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* Styling for individual playlist items */
-.playlist-suggestion-item {
-  display: flex; /* Align image and text side by side */
-  align-items: center; /* Center items vertically */
-  padding: 10px; /* Add space for better usability */
-  cursor: pointer; /* Pointer cursor for interactivity */
-  border-bottom: 1px solid #eee; /* Divider between items */
-  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth hover effect */
-}
-
-/* Remove border for the last item */
-.playlist-suggestion-item:last-child {
-  border-bottom: none;
-}
-
-/* Playlist image styling */
-.playlist-suggestion-image {
-  width: 40px; /* Fixed width for uniformity */
-  height: 40px; /* Fixed height to match width */
-  object-fit: cover; /* Ensure the image is cropped properly */
-  border-radius: 4px; /* Subtle rounded corners */
-  margin-right: 10px; /* Space between image and text */
-}
-
-/* Playlist text container */
-.playlist-suggestion-text {
-  flex-grow: 1; /* Use available space for text */
-  font-size: 14px; /* Standard font size */
-  color: #333; /* Readable dark text */
-  overflow: hidden; /* Prevent text overflow */
-  text-overflow: ellipsis; /* Add "..." for long text */
-  white-space: nowrap; /* Keep text on a single line */
-}
-
-/* Hover effect for playlist items */
-.playlist-suggestion-item:hover {
-  background-color: #f0f0f0; /* Highlight background on hover */
-  color: #000; /* Darker text for visibility */
-}
-
-/* Scrollbar customization (modern browsers) */
-.playlist-suggestions::-webkit-scrollbar {
-  width: 8px; /* Scrollbar width */
-}
-
-.playlist-suggestions::-webkit-scrollbar-thumb {
-  background-color: #ccc; /* Thumb color */
-  border-radius: 4px; /* Rounded scrollbar thumb */
-}
-
-.playlist-suggestions::-webkit-scrollbar-track {
-  background-color: #f9f9f9; /* Track color */
-}
-
 

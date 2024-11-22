@@ -850,6 +850,7 @@ const playSong = async (track_id,nowSongname) => {
             }}>
             Start Vibe
           </button>
+          <button className="sidebar-btn" onClick={handleLogout}>Logout</button>
           </div>
           <input  
             type = "text"
@@ -878,9 +879,7 @@ const playSong = async (track_id,nowSongname) => {
               </div>
               )
             }
-              <div className='Logout'>
-                  <button className="logout-btn" onClick={handleLogout}>Logout</button>
-              </div>
+
 
         </div>
       
