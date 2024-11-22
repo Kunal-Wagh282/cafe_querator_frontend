@@ -1,87 +1,69 @@
-/* Spotify Player Container */
+/* SpotifyPlayerWithProgress.css */
+
 .spotify-player-container {
-    padding: 20px;
-    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
-  }
-  
-  /* Progress Bar and Time Container */
-  .spotify-player-progress {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  /* Progress Bar (input[type="range"]) */
-  .spotify-player-progress input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 6px;
-    background: #ddd;
-    border-radius: 6px;
-    outline: none;
-    transition: background 0.3s ease;
-    cursor: pointer;
-  }
-  
-  .spotify-player-progress input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #4caf50;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  
-  .spotify-player-progress input[type="range"]::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background: #4caf50;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  
-  .spotify-player-progress input[type="range"]:hover::-webkit-slider-thumb,
-  .spotify-player-progress input[type="range"]:hover::-moz-range-thumb {
-    transform: scale(1.2);
-  }
-  
-  .spotify-player-progress input[type="range"]:focus {
-    background: #4caf50;
-  }
-  
-  /* Time Display */
-  .spotify-player-time {
-    font-family: "Arial", sans-serif;
-    font-size: 14px;
-    color: #333;
-    white-space: nowrap;
-  }
-  
-  /* Add hover effect to make the progress bar more interactive */
-  .spotify-player-container:hover input[type="range"] {
-    background: #ccc;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .spotify-player-container {
-      padding: 15px;
-      width: 90%;
-    }
-  
-    .spotify-player-time {
-      font-size: 12px;
-    }
-  }
-  
+  position: fixed; /* Stick the player bar to the bottom */
+  /* bottom: 0; */
+  left: 0;
+  width: 100vw; /* Full viewport width */
+  /* background-color: #121212; Dark Spotify theme */
+  /* padding: 10px 0; Add vertical padding */
+  /* box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5); Subtle shadow for effect */
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.spotify-player-progress {
+  width: 100%; /* Full width of the container */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.spotify-player-progress input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%; /* Stretch the progress bar */
+  height: 4px;
+  background: linear-gradient(to right, #1db954, #1ed760); /* Spotify green gradient */
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.spotify-player-progress input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  background-color: #ffffff; /* White knob */
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.spotify-player-progress input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2); /* Enlarges slightly on hover */
+}
+
+.spotify-player-progress input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.spotify-player-progress input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.spotify-player-time {
+  font-size: 14px;
+  color: #ffffff; /* White text for contrast */
+  font-family: "Arial", sans-serif;
+  text-align: center;
+}
