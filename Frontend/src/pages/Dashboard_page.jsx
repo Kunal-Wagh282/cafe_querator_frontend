@@ -694,8 +694,8 @@ const playSong = async (track_id,nowSongname) => {
           const rows = [];
 
           // Split the tables into rows of 7
-          for (let i = 0; i < tables.length; i += 7) {
-            rows.push(tables.slice(i, i + 7)); // Create a row with up to 7 tables
+          for (let i = 0; i < tables.length; i += 6) {
+            rows.push(tables.slice(i, i + 6)); // Create a row with up to 7 tables
           }
 
           return rows;
@@ -820,12 +820,12 @@ const playSong = async (track_id,nowSongname) => {
         {loading ? (
         <Preloader /> // Show the preloader
       ) : (<></>)}
-      <header className="dashboard-header">
-        {/* <div className="heading">
+      {/* <header className="dashboard-header">
+        <div className="heading">
             <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
             Let's change the vibe today!
-        </div> */}
-      </header>
+        </div>
+      </header> */}
       <ToastContainer />
 
       <div className="dashboard-content">
@@ -839,8 +839,8 @@ const playSong = async (track_id,nowSongname) => {
             onClick={playNextSong}
             disabled={isButtonDisabled}
             style={{
-              backgroundColor: isButtonDisabled ? '#F5F5DC' : '#007bff', // Change color when disabled
-              color: isButtonDisabled ? '#a1a1a1' : '#fff', // Text color when disabled
+              backgroundColor: isButtonDisabled ? '#F5F5DC' : '#F5F5DC', // Change color when disabled
+              color: isButtonDisabled ? '#a1a1a1' : 'black', // Text color when disabled
               cursor: isButtonDisabled ? 'not-allowed' : 'pointer', // Change cursor when disabled
             }}>
             Start Vibe
@@ -971,10 +971,10 @@ const playSong = async (track_id,nowSongname) => {
                       style={{
                         cursor: 'pointer',
                         backgroundColor: tableColors[table] || 'red', // Default to red
-                        width: '49px',
-                        height: '49px',
+                        width: '55px',
+                        height: '55px',
                         display: 'flex',
-                        margin: '25px',
+                        margin: '30px',
                         textAlign: 'center',
                         lineHeight: '50px',
                         color: 'black',
