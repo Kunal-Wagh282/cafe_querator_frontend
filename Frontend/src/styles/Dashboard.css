@@ -12,6 +12,7 @@
   width: 90%;
 }
 
+
 .ui-input {
   width: 100%;
   padding: 10px 10px 10px 40px;
@@ -130,6 +131,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  */
+
 }
 
 .sidebar-elements{
@@ -146,7 +149,7 @@
 
 /* Sidebar buttons */
 .sidebar-btn {
-  /* background-color: #F5F5DC; */
+  background-color: #F5F5DC;
   color: black;
   padding: 10px 20px;
   margin-bottom: 10px;
@@ -157,6 +160,7 @@
   text-align: left;
   font-size: 1rem;
 }
+
 
 .sidebar-btn:hover {
   background-color: #efefb9;
@@ -179,7 +183,7 @@
   display: flex;
   flex-direction: column;
   border-radius: 8px; /* Rounded corners for visual distinction */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
   align-items: center;
 }
 .queue{
@@ -189,7 +193,7 @@
   /* justify-content: center; */
 }
 .queue-list{
-  background-color: #dede95;
+  /* background-color: #dede95; */
   
 }
 
@@ -301,16 +305,16 @@
   justify-content: center;
   position: fixed;
   bottom: 0;
-  /* left: 0; */
-  width: 82.3%;
+  width: 80.8%;
   height: 85px;
-  /* background-color: #121212; Spotify dark theme */
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
-  padding: 10px 20px;
+  /* padding: 10px 20px; */
   z-index: 1000;
   box-sizing: border-box;
   flex-direction: column;
   gap : 20px;
+  opacity : 0.8;
+  background-color: #333;
 }
 
 /* Section for the song image and details */
@@ -318,7 +322,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  left: 0;
+  left: 30px;
   flex-direction: row;
 
 }
@@ -336,6 +340,8 @@
   height: 60px;
   border-radius: 8px;
   object-fit: cover;
+  align-items: center;
+  /* padding-left : 10px;  */
 }
 
 /* Song details styling */
