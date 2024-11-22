@@ -505,7 +505,7 @@ const playSong = async (track_id,nowSongname) => {
 
 
   // Handle search form submission
-  const handleSearchSubmit = async () => {
+  const handleSearchSubmit = async (searchQuery) => {
     if (searchQuery) {
       const results = await searchSongs(searchQuery);
       if (results.length > 0) {
@@ -565,14 +565,14 @@ const playSong = async (track_id,nowSongname) => {
 
   const handleSuggestionClick = (track) => {
     // Set the input value to the selected track's name
-    setSearchQuery(track.name);
+    setSearchQuery('');
   
     // Clear the suggestions dropdown
     setSuggestions([]);
   
     // Optionally, clear the search results if you are displaying them somewhere else
     setSearchResults([]);
-    handleSearchSubmit();
+    handleSearchSubmit(track.name);
   };
   
  
@@ -603,12 +603,10 @@ const playSong = async (track_id,nowSongname) => {
 
      try {
       // Call the POST API
-      const response = await axios.post(`${CONFIG.API_URL}/setplaylistvector`, playlistData,
-
+      const response = await axios.post(`${CONFIG.QUEUE_URL}/setplaylistvector`, playlistData,
         {
           headers: {
             'Authorization': `Bearer ${jwt}`,
-            'Content-Type': 'application/json', // Specify content type
           }
         }
       );
@@ -918,6 +916,7 @@ const playSong = async (track_id,nowSongname) => {
             placeholder="Type something..."
             class="ui-input"
             type="text"
+            value={searchQuery}
             onChange={handleSearchInputChange}
           />
           {suggestions.length > 0 && (

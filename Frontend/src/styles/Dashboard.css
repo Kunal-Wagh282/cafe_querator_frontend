@@ -182,18 +182,14 @@
   /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); Subtle shadow for depth */
   align-items: center;
 }
-
 .queue{
-
   width : 80% ;
   background-color: #dede95;
   /* justify-content: center; */
-
 }
-
 .queue-list{
   background-color: #dede95;
-  height : 85%;
+  
 }
 
 /* Optional music player styling */

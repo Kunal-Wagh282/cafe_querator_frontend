@@ -27,7 +27,6 @@ const Table = () => {
   const searchParams = new URLSearchParams(location.search);
   const cafeid = searchParams.get('id'); // Extract `code` query param
   const [loading, setLoading] = useState(true);
-  const [requestloading, setRequestLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   //const [results, setResults] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
@@ -277,7 +276,6 @@ const Table = () => {
         }
         if(error.response.data.message === "Vibe not match"){
           console.log(error)
-          setRequestLoading(true);
           openModal();
           notify("error","Vibe does not match, try another song!!")
           return
@@ -328,17 +326,26 @@ const Table = () => {
     };
   
     const handleRequest = () => {
-      console.log('Song requested to the admin!'); // Your logic here
+      console.log('Song requested to the admin!',songName); // Your logic here
+      sendMessage(`Song requested ${songName}`)
       closeModal();
     };
     
+    const sendMessage = (message) => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+        console.log('Message sent:', message);
+      } else {
+        console.error('WebSocket is not open');
+      }
+    };
 
 
   return (
     <div className="table-container">
       {loading ? (
         <Preloader /> // Show the preloader
-      ) : (<></>)}
+      ) : (null)}
     <Navbar cafeName={cafename}/>
       {/* Search Bar */}
       
@@ -377,16 +384,16 @@ const Table = () => {
 
 
 
-{requestloading ? (
+{isModalOpen ? (
         <ConfirmationModal
         isOpen={isModalOpen}
         onClose={closeModal}
         onConfirm={handleRequest}
         title="Request Song"
-        message="Do you want to request this song to the admin?"
+        message={`Do you want to request ${songName} song to the admin?`}
       />
       ) : (
-      <></>
+      null
       )}
 
 {/* Queue Section */}
