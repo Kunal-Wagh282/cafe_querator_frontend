@@ -13,7 +13,7 @@ src="https://lottie.host/a7229df5-e716-40f8-8295-6cda65243cf1/0BDBYmOiMO.lottie"
 loop
 autoplay/>
 </div>
-    </div>
+</div>
   );
 };
 

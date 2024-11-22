@@ -243,8 +243,6 @@ const Table = () => {
         const results = await searchSongs(searchQuery,accessToken);
         if (results.length > 0) {
           const selectedTrack = results[0];
-          setSongname(selectedTrack.name);
-          setTrackid(selectedTrack.id);
           const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
             {
               track_name: selectedTrack.name,
@@ -347,6 +345,7 @@ const Table = () => {
       {loading ? (
         <Preloader /> // Show the preloader
       ) : (null)}
+      
     <Navbar cafeName={cafename}/>
       {/* Search Bar */}
       
@@ -398,7 +397,7 @@ const Table = () => {
       )}
 
 {/* Queue Section */}
-<div className="queue">
+<div className="table-queue">
   <h2 className="queue-header">Ongoing Queue</h2>
   <ul className="queue-list">
     {queue.length > 0 ? (
@@ -426,7 +425,7 @@ const Table = () => {
 </div>
 
       {/* Current Song Section */}
-  <div className="current-song-section">
+  <div className="table-current-song-section">
     <h3>Now Playing</h3>
     <div className="current-song-info">
       {/* Display the album art dynamically */}
