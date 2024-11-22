@@ -157,15 +157,15 @@ const Dashboard = () => {
     try {
       // Fetch the next track from the API
 
-      const response = await axios.get(`${CONFIG.QUEUE_URL}/get-queue`, {
+      const response = await axios.get(`${CONFIG.QUEUE_URL}/next-track`, {
         headers: {
           "Authorization": `Bearer ${jwt}`, // Pass the access token if required
         }
       });
-      //console.log(response.data.Queue)
-      if (response.status === 200 && response.data.Queue[0]) 
+      // console.log(response.data)
+      if (response.status === 200 && response.data.Next_track) 
       {
-        const data = response.data.Queue[0];
+        const data = response.data.Next_track;
         //console.log(data.track_id);
         // Play the next track
         playSong(data.track_id,data.track_name); // Call your existing playSong function
@@ -587,8 +587,7 @@ const playSong = async (track_id,nowSongname) => {
   };
   
   const handlePlaylistSuggestionClick = async (playlist) => {
-    console.log(playlist.tracks.total)
-    if(playlist.tracks.total < 8){
+    if(playlist.tracks.total < 10){
       alert("Playlist should contain atleast 10 songs!")
       setPlaylistQuery('');
       setPlaylistSuggestions([]);

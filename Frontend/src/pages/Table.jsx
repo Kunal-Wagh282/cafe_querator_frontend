@@ -58,7 +58,7 @@ const Table = () => {
         return; // Handle this case accordingly (e.g., redirect to login)
       }
 
-      const ws = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${cjwt}`);
+      const ws = new WebSocket(`${CONFIG.WEBSOCKET_URL}/?jwt=${cjwt}`);
 
       ws.onopen = () => {
         console.log('WebSocket connection established');
@@ -85,7 +85,7 @@ const Table = () => {
         console.error('WebSocket error:', error);
         console.log('Retrying connection...');
         setTimeout(() => {
-          const newWs = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${cjwt}`);
+          const newWs = new WebSocket(`${CONFIG.WEBSOCKET_URL}/?jwt=${cjwt}`);
           setSocket(newWs);
         }, 5000); // Retry after 5 seconds
       };
@@ -104,7 +104,7 @@ const Table = () => {
 
   const updateCurrentSong = async () => {
     try {
-      const response = await axios.get(`${CONFIG.API_URL}/current-track`, {
+      const response = await axios.get(`${CONFIG.QUEUE_URL}/current-track`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('cjwt')}`,
         },
@@ -337,7 +337,7 @@ const Table = () => {
           onChange={handleSearchInputChange}
         />
         <button className="sidebar-btn" onClick={addTrack}>
-          Add Song to Queue
+          Click here to Add Song!
         </button>
         <ToastContainer />
       </div>

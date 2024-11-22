@@ -475,3 +475,79 @@
 
 }
 
+
+/* Playlist dropdown container */
+.playlist-suggestions {
+  border: 1px solid #ccc; /* Light border for separation */
+  background-color: #fff; /* Clean white background */
+  z-index: 10; /* Ensure it appears above other elements */
+  width: 100%; /* Make it span the full width of the parent */
+  margin-top: 5px; /* Space between input and dropdown */
+  border-radius: 4px; /* Rounded corners */
+  max-height: 250px; /* Limit dropdown height */
+  overflow-y: auto; /* Enable scrolling for overflow */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for visibility */
+}
+
+/* Remove default list styles */
+.playlist-suggestions ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Styling for individual playlist items */
+.playlist-suggestion-item {
+  display: flex; /* Align image and text side by side */
+  align-items: center; /* Center items vertically */
+  padding: 10px; /* Add space for better usability */
+  cursor: pointer; /* Pointer cursor for interactivity */
+  border-bottom: 1px solid #eee; /* Divider between items */
+  transition: background-color 0.2s ease, color 0.2s ease; /* Smooth hover effect */
+}
+
+/* Remove border for the last item */
+.playlist-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Playlist image styling */
+.playlist-suggestion-image {
+  width: 40px; /* Fixed width for uniformity */
+  height: 40px; /* Fixed height to match width */
+  object-fit: cover; /* Ensure the image is cropped properly */
+  border-radius: 4px; /* Subtle rounded corners */
+  margin-right: 10px; /* Space between image and text */
+}
+
+/* Playlist text container */
+.playlist-suggestion-text {
+  flex-grow: 1; /* Use available space for text */
+  font-size: 14px; /* Standard font size */
+  color: #333; /* Readable dark text */
+  overflow: hidden; /* Prevent text overflow */
+  text-overflow: ellipsis; /* Add "..." for long text */
+  white-space: nowrap; /* Keep text on a single line */
+}
+
+/* Hover effect for playlist items */
+.playlist-suggestion-item:hover {
+  background-color: #f0f0f0; /* Highlight background on hover */
+  color: #000; /* Darker text for visibility */
+}
+
+/* Scrollbar customization (modern browsers) */
+.playlist-suggestions::-webkit-scrollbar {
+  width: 8px; /* Scrollbar width */
+}
+
+.playlist-suggestions::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* Thumb color */
+  border-radius: 4px; /* Rounded scrollbar thumb */
+}
+
+.playlist-suggestions::-webkit-scrollbar-track {
+  background-color: #f9f9f9; /* Track color */
+}
+
+
