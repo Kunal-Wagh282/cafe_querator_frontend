@@ -26,7 +26,6 @@ const Dashboard = () => {
   const [trackName, setTrackName] = useState('');
   const [artistName, setArtistName] = useState('');
   const [player, setPlayer] = useState(null);
-  //const [deviceId, setDeviceId] = useState(null);
   const [uri, setUri] = useState('');
   const [trackId, setTrackid] = useState(""); // For search input
   const [songName, setSongname] = useState(""); // For search input
@@ -102,7 +101,7 @@ const Dashboard = () => {
         return; // Handle this case accordingly (e.g., redirect to login)
       }
 
-      const ws = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${jwt}`);
+      const ws = new WebSocket(`${CONFIG.WEBSOCKET_URL}/?jwt=${jwt}`);
 
       ws.onopen = () => {
         console.log('WebSocket connection established');
@@ -132,7 +131,7 @@ const Dashboard = () => {
         console.error('WebSocket error:', error);
         console.log('Retrying connection...');
         setTimeout(() => {
-          const newWs = new WebSocket(`wss://cafequerator-backend.onrender.com/ws/queue/?jwt=${jwt}`);
+          const newWs = new WebSocket(`${CONFIG.WEBSOCKET_URL}/?jwt=${jwt}`);
           setSocket(newWs);
         }, 5000); // Retry after 5 seconds
       };
@@ -223,7 +222,6 @@ const Dashboard = () => {
   
         spotifyPlayer.addListener('ready', ({ device_id }) => {
           console.log('Ready with Device ID', device_id);
-          //setDeviceId(device_id);
           localStorage.setItem("device_id",device_id)
         });
   
@@ -266,40 +264,18 @@ const Dashboard = () => {
         }
     });
   
-        
-        spotifyPlayer.connect();
-        setPlayer(spotifyPlayer);
+    spotifyPlayer.connect().then(success => {
+      if (success) {
+        console.log('The Web Playback SDK successfully connected to Spotify!');
+      }
+    })
+      setPlayer(spotifyPlayer);
       };
     }
-  }, [navigate]);
+  }, [accessToken]);
 
 
-  const startProgressInterval = (currentPosition, totalDuration) => {
-    clearProgressInterval(); // Clear any existing interval
-    const id = setInterval(() => {
-        setPosition((prevPosition) => {
-            const newPosition = prevPosition + 1000; // Update by 1 second
-            return newPosition >= totalDuration ? totalDuration : newPosition;
-        });
-    }, 1000);
-    setIntervalId(id);
-};
 
-const clearProgressInterval = () => {
-  if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
-  }
-};
-
-const handleSeek = (newPosition) => {
-  if (player) {
-      player.seek(newPosition).catch((error) => {
-          console.error('Error seeking:', error);
-      });
-      setPosition(newPosition);
-  }
-};
   
 
   useEffect(() => {
@@ -418,7 +394,6 @@ const handleSeek = (newPosition) => {
           'Authorization': `Bearer ${jwt}`,
         },
       });
-      console.log(response.data)
       const { cafe_info ,token_info ,table_status } = response.data;
       localStorage.setItem("refresh_token",token_info.refresh_token);
       setAccessToken(token_info.access_token);
@@ -445,10 +420,8 @@ const handleSeek = (newPosition) => {
       await axios.post(`${CONFIG.API_URL}/logout`, {}); // Added withCredentials
       localStorage.removeItem("jwt");
       localStorage.removeItem("refresh_token");
-
       if(player)
       {
-        //setDeviceId(null);
         localStorage.removeItem("device_id");
         setAccessToken("");
         setIsPlaying(false);
@@ -501,6 +474,7 @@ const playSong = async (track_id,nowSongname) => {
 
     const songUri = response.data.uri; // Get the song URI from the response
     const deviceId=localStorage.getItem("device_id");
+    if(deviceId){
     // Play the song using the URI
     await axios.put(
       `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
@@ -513,9 +487,17 @@ const playSong = async (track_id,nowSongname) => {
           'Content-Type': 'application/json', 
         },
       }
+      
     );
-
     console.log('Playing song with URI:', songUri);
+    }
+    else{
+      console.log("Device ID not found")
+    }
+
+
+
+    
 
   } catch (error) {
     console.error('Error fetching song features or playing the song:', error);
@@ -526,17 +508,13 @@ const playSong = async (track_id,nowSongname) => {
 
 
   // Handle search form submission
-  const handleSearchSubmit = async (e) => {
-    e.preventDefault();
+  const handleSearchSubmit = async () => {
     if (searchQuery) {
       const results = await searchSongs(searchQuery);
       if (results.length > 0) {
         const selectedTrack = results[0]; // Assuming the first result is what the user meant
         
-        //console.log(selectedTrack);
-        // Fetch the song features
-        //const features = await fetchSongFeatures(trackId);
-        //playSong(selectedTrack.id);
+  
         try {
           const response = await axios.post(`${CONFIG.QUEUE_URL}/add-track`,
             {
@@ -563,10 +541,7 @@ const playSong = async (track_id,nowSongname) => {
           console.error('Error adding song:', error);
 
         }
-        // if (features) {
-        //   // Store the features (e.g., danceability, energy, etc.)
-        //   setSongFeatures(features); // Assume you have a state to store features
-        // }
+       
       }
     }
   };
@@ -587,6 +562,7 @@ const playSong = async (track_id,nowSongname) => {
     const value = e.target.value;
     setSearchQuery(value);
     fetchSuggestions(value); // Fetch suggestions based on input
+    
   };
 
 
@@ -599,17 +575,10 @@ const playSong = async (track_id,nowSongname) => {
   
     // Optionally, clear the search results if you are displaying them somewhere else
     setSearchResults([]);
+    handleSearchSubmit();
   };
   
-  const handlePlaylistSearchSubmit = async (e) => {
-    e.preventDefault();
-    if (playlistQuery) {
-      const results = await searchPlaylists(playlistQuery);
-      if (results.length > 0) {
-        setSelectedPlaylist(results[0]);
-      }
-    }
-  };
+ 
   
   const handlePlaylistInputChange = (e) => {
     const value = e.target.value;
@@ -638,7 +607,7 @@ const playSong = async (track_id,nowSongname) => {
 
      try {
       // Call the POST API
-      const response = await axios.post('https://cafequerator-backend.onrender.com/api/setplaylistvector', playlistData,
+      const response = await axios.post(`${CONFIG.API_URL}/setplaylistvector`, playlistData,
 
         {
           headers: {
@@ -697,7 +666,7 @@ const playSong = async (track_id,nowSongname) => {
   const getQRcode = async () => {
     try {
       const response = await axios.post(
-        'https://cafequerator-backend.onrender.com/api/genpdf', 
+        `${CONFIG.API_URL}/genpdf`, 
         {}, 
         {
           headers: {
@@ -885,28 +854,34 @@ const playSong = async (track_id,nowSongname) => {
           </button>
           <button className="sidebar-btn" onClick={getQRcode} >Table QR</button>
 
-          <form onSubmit={handlePlaylistSearchSubmit}>
-            <input  
+          <input  
             type = "text"
             placeholder = "search your playlist"
             value = {playlistQuery}
             onChange = {handlePlaylistInputChange}
-            />
-          </form>
+          />
+          
 
-            <button type = "submit">Search Playlist</button>
-            
-            {playlistSuggestions.length > 0 && (
-                <div className="playlist-suggestions">
-                  <ul>
-                    {playlistSuggestions.map((playlist) => (
-                      <li key={playlist.id} onClick={() => handlePlaylistSuggestionClick(playlist)}>
-                        {playlist.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+          {playlistSuggestions.length > 0 && (
+              <div className="playlist-suggestions">
+                <ul>
+                  {playlistSuggestions.map((playlist) => (
+                    <li key={playlist.id} onClick={() => handlePlaylistSuggestionClick(playlist)} className="playlist-suggestion-item">
+                      <img 
+                        src={playlist.images[0]?.url || 'https://placeholder.com/150'} // Display album image
+                        alt={playlist.name}
+                        className="playlist-suggestion-image"
+                      />
+                      <div className="playlist-suggestion-text">
+                        <span className="playlist-name">{playlist.name}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              )
+            }
+
         </div>
       
        {/* --------------------------this is the main section code----------------------------- */}
@@ -954,15 +929,12 @@ const playSong = async (track_id,nowSongname) => {
         <div className="queue-section">
           <h2>Queue</h2>
           <div className="spotify-queue">
-            <form onSubmit={handleSearchSubmit}>
               <input
                 type="text"
                 placeholder="Search for a song..."
                 value={searchQuery}
                 onChange={handleSearchInputChange}
               />
-              <button type="submit">Add to Queue</button>
-            </form> 
 
             {suggestions.length > 0 && (
               <div className="suggestions">
