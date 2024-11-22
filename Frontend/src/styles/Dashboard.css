@@ -214,48 +214,54 @@
 }
 
 /* --------------------------------------------------------------------------------------current song section------------------------------------------------------------------------------------------- */
+
 .current-song-sectiond {
   position: fixed;
   bottom: 0;
-  left: 0;
+  /* left: 0; */
   width: 100%;
   /* background-color: #282828; Dark background like Spotify */
-  color: black;
-  height : 80px ;
+  /* color: black; */
+  height : 180px ;
   display: flex;
   justify-content: center; /* Center all content horizontally */
   align-items: center; /* Align content vertically */
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
-  padding : 10px ;
-  background-color:#F5F5DC;
+  /* padding : 10px ; */
+  /* background-color:#F5F5DC; */
+  flex-direction: column;
+  gap:2px;
+  grid-template-rows: 1rm 2rm ;
+}
+
+.current-song-infoo{
+  height :10vh ;
+  width : 90vw ;
+  background-color: white;
+  border-radius : 10px ;
+  grid-template-columns: 1rm 1rm 1rm;
+}
+
+.song-image-details{
+  grid-column: 1;
+  flex-direction: column;
+  grid-template-columns: 1rm 2rm;
+  gap : 10 px;
 }
 
 .song-image {
-  grid-column: 1; /* Place the song image in the first column */
-  justify-self: left; /* Center the image horizontally within its grid area */
-  height : 80px ;
-  width : 80px;
-  border-radius:5px;
-  flex-direction: column ;
+  grid-column: 1;
+width : 50px;
+height : 50px ;  
 
 }
 .song-image img{
-  height : 100% ;
-  width: 100%;
-  border-radius: 5px;
+  width : 70px;
+  height : 70px ;  
 }
 
 .current-song-details {
-  grid-column: 2; /* Place the song details in the second column */
-  display: flex;
-  flex-direction: column; /* Stack the song title and artist vertically */
-  justify-content: center; /* Vertically center the content */
-  justify-self : left ;
-  align-items: center; /* Horizontally center the content */
-  width : 100%;
-  height : 80%;
-  background-color: white;
-  border-radius : 5px ;
+  grid-column: 2;
 }
 
 
@@ -265,30 +271,14 @@
   background-color: white;
 }
 
-.current-song-infoo{
-  height : 80px;
-  border-radius: 12px ;
-  display: grid;
-  grid-template-rows: 2fr 2fr 20fr; /* Three columns: 1 for image, 2 for details, 1 for buttons */
-  /* grid-template-rows: 80px; Adjust row height automatically */
-  gap: 5px; /* Optional gap between the columns */
-  background-color:#F7E7CE;
-  width : 85%;
-  align-items: center;
-  padding : 5px;
-  column-rule-color: #0056b3;
-}
 
 
 .current-song-buttons {
-  grid-column: 3; /* Place the buttons in the third column */
-  display: flex;
-  flex-direction: row; /* Arrange buttons horizontally */
-  justify-content: center; /* Center buttons horizontally */
-  align-items: center ;
-  gap: 10px; /* Space between the buttons */
-  /* background-color: white ; */
-  
+  grid : 2;
+  display : flex ;
+  width : 200 px;
+  height: 100px;
+  flex-direction: row;
 }
 
 .current-song-buttons button {
@@ -314,30 +304,8 @@
   transform: scale(0.95); /* Slightly reduce size on click */
 }
 
-.music-progress-bar {
-  grid-column : 4 ;
-  width: 400px;
-  background-color: #e0e0e0;
-  border-radius: 2px;
-  height: 8px;
-  margin-top: 10px;
-}
 
-/* .progress-bar {
-  background-color: #1DB954; 
-  height: 100%;
-  border-radius: 5px;
-}  */
 
-.current-heading{
-  display : flex ;
-  align-items: center;
-  width: 150px;
-  height : 90% ;
-  background-color: white;
-  border-radius:5px ;
-  padding-left: 30px;
-}
 
 /* ---------------------------------------------------------------table-icon-------------------------------------------------------------------------- */
 .table-square{
@@ -362,33 +330,3 @@
 
 }
 
-
-.progress-bar input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%; /* Full width */
-  height: 8px; /* Adjust thickness */
-  background: #ddd; /* Background color */
-  border-radius: 4px;
-  outline: none;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.progress-bar input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px; /* Thumb size */
-  height: 16px;
-  background: #1db954; /* Spotify green */
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.progress-bar input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #1db954;
-  border-radius: 50%;
-  cursor: pointer;
-}

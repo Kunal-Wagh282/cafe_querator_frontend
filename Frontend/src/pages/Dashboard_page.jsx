@@ -271,7 +271,7 @@ const Dashboard = () => {
         setPlayer(spotifyPlayer);
       };
     }
-  }, [accessToken]);
+  }, [navigate]);
 
 
   const startProgressInterval = (currentPosition, totalDuration) => {
@@ -510,7 +510,7 @@ const playSong = async (track_id,nowSongname) => {
       {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', 
         },
       }
     );
@@ -1023,31 +1023,36 @@ const playSong = async (track_id,nowSongname) => {
 
       {/* Current Song Section */}
         <div className="current-song-sectiond">
-          <div className="current-heading">
-            <h3>Now Playing  :</h3>
-          </div>
-          <div className="current-song-infoo">
-            {/* Display the album art dynamically */}
-            <div className="song-image">
-              {/* image of the song or album */}
-              <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
-            </div>
-            <div className="current-song-details">
-              {/* Display the current song name dynamically */}
-              <p className="song-title">{songName || 'Song Title'}</p>
-              {/* Display the artist name dynamically */}
-              <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
-            </div>
-            <div className="current-song-buttons">
-              <button ><FontAwesomeIcon icon={faBackward} /></button>
-              <button onClick={handlePlayPause}>{isPaused ? (<FontAwesomeIcon icon={faPlay} />) : (<FontAwesomeIcon icon={faPause} />)}</button>
-              <button onClick={playNextSong}><FontAwesomeIcon icon={faForward} /></button>
-            </div>
-          </div>
-          <SpotifyPlayerWithProgress player={player} />
 
+          <div className="current-heading">
+            <SpotifyPlayerWithProgress player={player} />
+          </div>
+              
+          <div className="current-song-infoo">
+                  <div className="song-image-detail">
+                      <div className="song-image">
+                        <img src={track_img_url || 'https://placeholder.com/150'} alt="Album Art" />
+                      </div>
+
+                      <div className="current-song-details"> 
+                        <p className="song-title">{songName || 'Song Title'}</p>
+                        <p className="artist-name">{track_artist_name || 'Artist Name'}</p> 
+                      </div>
+                  </div>
+                  
+                  <div className="current-song-buttons">
+                    <button ><FontAwesomeIcon icon={faBackward} /></button>
+                    <button onClick={handlePlayPause}>{isPaused ? (<FontAwesomeIcon icon={faPlay} />) : (<FontAwesomeIcon icon={faPause} />)}</button>
+                    <button onClick={playNextSong}><FontAwesomeIcon icon={faForward} /></button>
+                  </div>
+                  <div className="Dont know">
+
+                  </div>
+          </div>
         </div>
-    </div>
+</div>
+
+
 
   );
 };
