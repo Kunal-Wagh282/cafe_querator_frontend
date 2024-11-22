@@ -276,6 +276,7 @@ const Table = () => {
         }
         if(error.response.data.message === "Vibe not match"){
           console.log(error)
+          setSearchQuery('');
           openModal();
           notify("error","Vibe does not match, try another song!!")
           return

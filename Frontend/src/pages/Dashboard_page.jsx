@@ -68,6 +68,9 @@ const Dashboard = () => {
   // Miscellaneous
   const [loading, setLoading] = useState(true);
 
+  const [requestedSongs,setRequestedSongs] =useState([]);
+
+
   useEffect(() => {
     setTimeout(() => {
       setLoading(false); // Simulate data loading or some async operation
@@ -112,8 +115,13 @@ const Dashboard = () => {
         if (event.data === 'queue updated') {
           fetchQueue();
         }
-        if (event.data === 'current track updated') {
-          //fetchQueue();
+        if (event.data.startsWith('Song requested')) {
+          // Extract the song name from the message after 'Song requested '
+          const requestedSong = event.data.slice('Song requested '.length).trim();
+          updateRequestedSong(requestedSong);
+          
+          // Optionally, you can trigger a notification, update state, or display a message
+    
         }
         if (event.data.startsWith('Table') && event.data.includes('Turned On')) {
           const tableNumber = event.data.split(' ')[1];  // Extract table number
@@ -148,7 +156,16 @@ const Dashboard = () => {
   }, []);
 
 
-  
+  const updateRequestedSong = async (requestedSong) => {
+    const songExists = requestedSongs.some(song => song.name === requestedSong);  
+  if (songExists) {
+    console.log("Song already in the list");
+  } else {
+    // Add the song to the requestedSongs array if it does not exist
+    const results = await searchSongs(requestedSong); // Await results
+    setRequestedSongs((prevSongs) => [...prevSongs, results[0]]);
+    console.log("Song added:", results[0].album.name);
+  }  }
 
 
 
@@ -339,6 +356,7 @@ const Dashboard = () => {
         localStorage.setItem("refresh_token",response.data.refresh_token)
       }
       console.log("Access token refreshed successfully.");
+      localStorage.setItem("access_token",access_token)
       sendTokenToBackend(access_token, spotifyRefreshToken, newExpiresAt);     
       } 
     catch (error) {
@@ -393,6 +411,7 @@ const Dashboard = () => {
       });
       const { cafe_info ,token_info ,table_status } = response.data;
       localStorage.setItem("refresh_token",token_info.refresh_token);
+      localStorage.setItem("access_token",token_info.access_token)
       setAccessToken(token_info.access_token);
       setCafeInfo(cafe_info);
       setRefreshToken(token_info.refresh_token);
@@ -433,6 +452,9 @@ const Dashboard = () => {
 
   // Function to search songs using Spotify API
   const searchSongs = async (query) => {
+    const accessToken = localStorage.getItem("access_token")
+
+
     if (!accessToken) return [];
     const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
 
@@ -552,6 +574,7 @@ const playSong = async (track_id,nowSongname) => {
 
     const results = await searchSongs(query); // Await results
     setSuggestions(results); // Store search results as suggestions
+
   };
 
   // Handle search input change
@@ -600,17 +623,16 @@ const playSong = async (track_id,nowSongname) => {
       playlist_name: playlist.name,
       playlist_id: playlist.id,
      };
-
+     console.log(playlistData)
      try {
       // Call the POST API
-      const response = await axios.post(`${CONFIG.QUEUE_URL}/setplaylistvector`, playlistData,
+      const response = await axios.post(`${CONFIG.API_URL}/setplaylistvector`, playlistData,
         {
           headers: {
             'Authorization': `Bearer ${jwt}`,
           }
         }
       );
-      console.log('Playlist data sent successfully:', response.data);
       if(response.data.message === "Playlist vector updated successfully")
       {
         notify("success",`Playlist: ${playlist.name} selected`)
@@ -812,6 +834,20 @@ const playSong = async (track_id,nowSongname) => {
             }
           };
 
+          const handleAccept = (acceptedSongName) => {
+            handleSearchSubmit(acceptedSongName);
+            setRequestedSongs((prevSongs) =>
+              prevSongs.filter((selectedTrack) => selectedTrack.name !== acceptedSongName)
+            );
+          };
+          
+          const handleRemove = (rejectedSongName) => {
+            setRequestedSongs((prevSongs) =>
+              prevSongs.filter((selectedTrack) => selectedTrack.name !== rejectedSongName)
+            );
+          };
+          
+
 
   // Render the component
   return (
@@ -847,6 +883,7 @@ const playSong = async (track_id,nowSongname) => {
           </button>
           <button className="sidebar-btn" onClick={handleLogout}>Logout</button>
           </div>
+          
           <input  
             type = "text"
             placeholder = "search your playlist"
@@ -909,11 +946,11 @@ const playSong = async (track_id,nowSongname) => {
               )
             }
           </div> */
-          <div class="ui-input-container">
+          <div className="ui-input-container">
           <input
             required=""
-            placeholder="Type something..."
-            class="ui-input"
+            placeholder="What do you want to listen to?"
+            className="ui-input"
             type="text"
             value={searchQuery}
             onChange={handleSearchInputChange}
@@ -938,14 +975,14 @@ const playSong = async (track_id,nowSongname) => {
               </div>
               )
             }
-          <div class="ui-input-underline"></div>
-          <div class="ui-input-highlight"></div>
-          <div class="ui-input-icon">
+          <div className="ui-input-underline"></div>
+          <div className="ui-input-highlight"></div>
+          <div className="ui-input-icon">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <path
-                stroke-linejoin="round"
-                stroke-linecap="round"
-                stroke-width="2"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2"
                 stroke="currentColor"
                 d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
               ></path>
@@ -1028,7 +1065,62 @@ const playSong = async (track_id,nowSongname) => {
                 )}
               </ul>
             </div>
+
+
+
+
+            <h2>Rejected Songs:</h2>
+<div className="queue-section">
+<div className="queue">
+  <ul className="queue-list">
+    {requestedSongs.length > 0 ? (
+      requestedSongs.map((selectedTrack, index) => (
+        <li key={index} className="queue-item">
+          {/* Display song image dynamically */}
+          <img 
+            src={selectedTrack.album.images[0]?.url || 'https://placeholder.com/150'} // Use dynamic image URL
+            alt={selectedTrack.name}
+            className="song-thumbnail"
+          />
+          <div className="song-details">
+            {/* Display song name dynamically */}
+            <span className="song-title">{selectedTrack.name}</span>
+            {/* Display artist name dynamically */}
+            {/* <span className="song-artist">{selectedTrack.album.artists[0]?.name || 'Unknown Artist'}</span> */}
+            
+            <br />
+            {/* <span className="song-origin">
+              ({track.id === 0 ? 'Table Admin' : `Table ${track.id}`})
+            </span> */}
           </div>
+          <div className="action-buttons">
+            <button 
+              className="accept-btn" 
+              onClick={() => handleAccept(selectedTrack.name)}
+            >
+              Accept
+            </button>
+            <button 
+              className="deny-btn" 
+              onClick={() => handleRemove(selectedTrack.name)}
+            >
+              Remove
+            </button>
+          </div>
+        </li>
+      ))
+    ) : (
+      <p className="no-rejected-songs">No rejected songs available</p>
+    )}
+  </ul>
+</div>
+</div>
+
+
+
+
+
+          </div>   
       </div>
 
 
