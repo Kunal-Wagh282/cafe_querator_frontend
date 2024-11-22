@@ -215,71 +215,89 @@
 
 /* --------------------------------------------------------------------------------------current song section------------------------------------------------------------------------------------------- */
 
+/* Main container for the bar */
 .current-song-sectiond {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   bottom: 0;
   /* left: 0; */
   width: 100%;
-  /* background-color: #282828; Dark background like Spotify */
-  /* color: black; */
-  height : 180px ;
+  height: 80px;
+  /* background-color: #121212; Spotify dark theme */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+  padding: 10px 20px;
+  z-index: 1000;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+/* Section for the song image and details */
+.song-image-detail {
   display: flex;
-  justify-content: center; /* Center all content horizontally */
-  align-items: center; /* Align content vertically */
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
-  /* padding : 10px ; */
-  /* background-color:#F5F5DC; */
-  flex-direction: column;
-  gap:2px;
-  grid-template-rows: 1rm 2rm ;
-}
-
-.current-song-infoo{
-  height :10vh ;
-  width : 90vw ;
-  background-color: white;
-  border-radius : 10px ;
-  grid-template-columns: 1rm 1rm 1rm;
-}
-
-.song-image-details{
-  grid-column: 1;
-  flex-direction: column;
-  grid-template-columns: 1rm 2rm;
-  gap : 10 px;
-}
-
-.song-image {
-  grid-column: 1;
-width : 50px;
-height : 50px ;  
+  align-items: center;
+  gap: 10px;
+  left: 0;
 
 }
-.song-image img{
-  width : 70px;
-  height : 70px ;  
+
+/* Song image styling */
+.song-image img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
+/* Song details styling */
 .current-song-details {
-  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-
-
-.song-title, .artist-name {
-  text-align: center; /* Center the text for song title and artist name */
-  background-color: white;
+.song-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
 }
 
+.artist-name {
+  font-size: 12px;
+  color: #b3b3b3;
+  margin: 0;
+}
 
-
+/* Play/Pause buttons section */
 .current-song-buttons {
-  grid : 2;
-  display : flex ;
-  width : 200 px;
-  height: 100px;
-  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
+
+.current-song-buttons button {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.current-song-buttons button:hover {
+  transform: scale(1.2);
+}
+
+/* White container at the right */
+.Dont-know {
+  width: 150px; /* Adjust the size of the white container */
+  height: 60px;
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
 
 .current-song-buttons button {
   background-color: #333; /* Dark background */
@@ -304,7 +322,10 @@ height : 50px ;
   transform: scale(0.95); /* Slightly reduce size on click */
 }
 
-
+.song-image-detail{
+  display : flex;
+  flex-direction: row ;
+}
 
 
 /* ---------------------------------------------------------------table-icon-------------------------------------------------------------------------- */
