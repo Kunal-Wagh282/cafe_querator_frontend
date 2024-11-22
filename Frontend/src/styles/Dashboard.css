@@ -1,27 +1,95 @@
 /* Container for the entire dashboard */
 .dashboard-container {
+  padding-top: 0px;
   display: grid;
-  grid-template-rows: 10vh auto; /* 10vh for the header, rest for the content */
+  /* grid-template-rows: 10vh auto; 10vh for the header, rest for the content */
   grid-template-columns: 1fr auto 1fr; /* Sidebar, main section, queue section */
-  height: 100vh; /* Full height of the viewport */
+  height: 100%; /* Full height of the viewport */
   width: 100vw; /* Full width of the viewport */
 }
+.ui-input-container {
+  position: relative;
+  width: 90%;
+}
+
+.ui-input {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  font-size: 1em;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  background-color: transparent;
+  transition: border-color 0.3s;
+}
+
+.ui-input:focus {
+  border-color: #F5F5DC;
+}
+
+.ui-input-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background-color: #dede95;
+  transform: scaleX(0);
+  transition: transform 0.3s;
+}
+
+.ui-input:focus + .ui-input-underline {
+  transform: scaleX(1);
+}
+
+.ui-input-highlight {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  /* background-color: rgba(108, 99, 255, 0.1); */
+  transition: width 0.3s;
+}
+
+.ui-input:focus ~ .ui-input-highlight {
+  width: 100%;
+}
+
+.ui-input-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #dede95;
+  transition: color 0.3s;
+}
+
+.ui-input:focus ~ .ui-input-icon {
+  color: #dede95;
+}
+
+.ui-input-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
 
 /* Header section */
-.dashboard-header {
-  grid-column: 1 / -1; /* Span all columns to cover full width */
-  background-color: #6B7A40; /* Customize the background color */
+/* .dashboard-header {
+  grid-column: 1 / -1; Span all columns to cover full width
+  background-color: #6B7A40; Customize the background color
   display: flex;
   justify-content: baseline;
   align-items: center;
   bottom : 0 ;
-  width: 96.5%; /* Full width of the screen */
-  height: 10vh; /* 1/10th of the screen height */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+  width: 50%; Full width of the screen
+  height: 10vh; 1/10th of the screen height
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); Adds a subtle shadow
   padding-left: 50px;
   color : white ;
   flex-direction: row ;
-}
+} */
 
 .heading {
   width : 90% ;
@@ -49,7 +117,7 @@
 .dashboard-content {
   grid-column: 1 / -1; /* Span all columns */
   display: grid;
-  grid-template-columns: 350px auto 350px; /* Sidebar, main section, queue section */
+  grid-template-columns: 300px auto 350px; /* Sidebar, main section, queue section */
   height: calc(100vh - 10vh); /* Space between the header and music player */
   background-color: #fff;
 }
@@ -64,22 +132,34 @@
   align-items: center;
 }
 
+.sidebar-elements{
+  bottom : 0;
+  text-align: left;
+  border-radius : 10px ;
+  background-color: #F5F5DC;
+  /* background-color: white; */
+  width : 80% ;
+  height : 140% ;
+  align-self: center;
+
+}
+
 /* Sidebar buttons */
 .sidebar-btn {
-  background-color: #D9D9D9;
+  background-color: #F5F5DC;
   color: black;
   padding: 10px 20px;
   margin-bottom: 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 60%;
-  text-align: center;
+  width: 100%;
+  text-align: left;
   font-size: 1rem;
 }
 
 .sidebar-btn:hover {
-  background-color: #0056b3;
+  background-color: #efefb9;
 }
 
 /* Main section styling */
@@ -99,19 +179,20 @@
   display: flex;
   flex-direction: column;
   border-radius: 8px; /* Rounded corners for visual distinction */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); Subtle shadow for depth */
   align-items: center;
 }
 
 .queue{
-  padding-left : 10px ; 
+
   width : 80% ;
-  background-color: purple;
+  background-color: #dede95;
   /* justify-content: center; */
 
 }
 
 .queue-list{
+  background-color: #dede95;
   height : 85%;
 }
 
@@ -133,7 +214,7 @@
 /* Suggestions dropdown styling */
 .suggestions {
   border: 1px solid #ccc; /* Border to distinguish suggestions */
-  background-color: #fff; /* Background color for the dropdown */
+  background-color: #dede95; /* Background color for the dropdown */
   position: absolute; /* Position it absolutely below the input */
   z-index: 10; /* Ensure it appears above other elements */
   width: 25vh; /* Match the width of the input */
@@ -157,13 +238,13 @@
 }
 
 .suggestions li:hover {
-  background-color: #f0f0f0; /* Highlight suggestion on hover */
+  background-color: #dede95; /* Highlight suggestion on hover */
 }
 
 
 .set-vibe {
-  padding: 20px;
-  background-color: #f9f9f9; /* Light background for distinction */
+
+  background-color: #dede95; /* Light background for distinction */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   margin-bottom: 20px; /* Space below the section */
@@ -218,19 +299,21 @@
 /* Main container for the bar */
 .current-song-sectiond {
   display: flex;
+  right : 0 ;
   align-items: center;
   justify-content: center;
   position: fixed;
   bottom: 0;
   /* left: 0; */
-  width: 100%;
-  height: 80px;
+  width: 80.8%;
+  height: 85px;
   /* background-color: #121212; Spotify dark theme */
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
   padding: 10px 20px;
   z-index: 1000;
   box-sizing: border-box;
   flex-direction: column;
+  gap : 20px;
 }
 
 /* Section for the song image and details */
@@ -243,8 +326,11 @@
 
 }
 .current-song-infoo{
+  grid-template-columns: auto auto;
   display: flex;
-  flex-direction: column;
+  gap : 300px;
+  align-items: center;
+  
 }
 
 /* Song image styling */
@@ -265,7 +351,7 @@
 .song-title {
   font-size: 14px;
   font-weight: bold;
-  color: #ffffff;
+  color: #dede95;
   margin: 0;
 }
 
@@ -278,8 +364,9 @@
 /* Play/Pause buttons section */
 .current-song-buttons {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   gap: 15px;
+  padding-right:300px ;
 }
 
 .current-song-buttons button {
@@ -305,6 +392,7 @@
 
 
 .current-song-buttons button {
+  grid-column: 2;
   background-color: #333; /* Dark background */
   color: #fff; /* White icon color */
   border: none; /* Remove default button border */
@@ -328,6 +416,7 @@
 }
 
 .song-image-detail{
+  grid-column: 1;
   display : flex;
   flex-direction: row ;
 }
