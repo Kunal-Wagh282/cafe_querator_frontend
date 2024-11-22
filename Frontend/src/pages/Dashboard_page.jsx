@@ -823,33 +823,31 @@ const playSong = async (track_id,nowSongname) => {
         <Preloader /> // Show the preloader
       ) : (<></>)}
       <header className="dashboard-header">
-        <div className="heading">
+        {/* <div className="heading">
             <h1>Welcome {cafeInfo ? cafeInfo.Cafe_Name : 'Cafe'} to Cafe-Qurator</h1>
             Let's change the vibe today!
-        </div>
-        <div className='Logout'>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
-        </div>
+        </div> */}
       </header>
       <ToastContainer />
 
       <div className="dashboard-content">
         <div className="sidebar">
+          <div className='sidebar-elements'>
           <h1>Dashboard</h1>
           <button className="sidebar-btn" >Home</button>
+          <button className="sidebar-btn" onClick={getQRcode} >Table QR</button>
           <button
             className="sidebar-btn"
             onClick={playNextSong}
             disabled={isButtonDisabled}
             style={{
-              backgroundColor: isButtonDisabled ? '#d3d3d3' : '#007bff', // Change color when disabled
+              backgroundColor: isButtonDisabled ? '#F5F5DC' : '#007bff', // Change color when disabled
               color: isButtonDisabled ? '#a1a1a1' : '#fff', // Text color when disabled
               cursor: isButtonDisabled ? 'not-allowed' : 'pointer', // Change cursor when disabled
             }}>
             Start Vibe
           </button>
-          <button className="sidebar-btn" onClick={getQRcode} >Table QR</button>
-
+          </div>
           <input  
             type = "text"
             placeholder = "search your playlist"
@@ -877,11 +875,88 @@ const playSong = async (track_id,nowSongname) => {
               </div>
               )
             }
+              <div className='Logout'>
+                  <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              </div>
 
         </div>
       
        {/* --------------------------this is the main section code----------------------------- */}
           <div className="main-section">
+          {/* <div className="spotify-queue">
+              <input
+                type="text"
+                placeholder="Search for a song..."
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+              />
+
+            {suggestions.length > 0 && (
+              <div className="suggestions">
+                <ul>
+                  {suggestions.map((track) => (
+                    <li key={track.id} onClick={() => handleSuggestionClick(track)} className="suggestion-item">
+                      <img 
+                        src={track.album?.images[0]?.url || 'https://placeholder.com/150'} // Display album image
+                        alt={track.name}
+                        className="suggestion-image"
+                      />
+                      <div className="suggestion-text">
+                        <span className="track-name">{track.name}</span>
+                        <span className="artist-name">{track.artists.map((artist) => artist.name).join(', ')}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              )
+            }
+          </div> */
+          <div class="ui-input-container">
+          <input
+            required=""
+            placeholder="Type something..."
+            class="ui-input"
+            type="text"
+            onChange={handleSearchInputChange}
+          />
+          {suggestions.length > 0 && (
+              <div className="suggestions">
+                <ul>
+                  {suggestions.map((track) => (
+                    <li key={track.id} onClick={() => handleSuggestionClick(track)} className="suggestion-item">
+                      <img 
+                        src={track.album?.images[0]?.url || 'https://placeholder.com/150'} // Display album image
+                        alt={track.name}
+                        className="suggestion-image"
+                      />
+                      <div className="suggestion-text">
+                        <span className="track-name">{track.name}</span>
+                        <span className="artist-name">{track.artists.map((artist) => artist.name).join(', ')}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              )
+            }
+          <div class="ui-input-underline"></div>
+          <div class="ui-input-highlight"></div>
+          <div class="ui-input-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path
+                stroke-linejoin="round"
+                stroke-linecap="round"
+                stroke-width="2"
+                stroke="currentColor"
+                d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+              ></path>
+            </svg>
+          </div>
+        </div>
+
+          
+          }
             <div className="table-heading">
               <h1>Table</h1>
             </div>
@@ -923,36 +998,6 @@ const playSong = async (track_id,nowSongname) => {
 
 
         <div className="queue-section">
-          <h2>Queue</h2>
-          <div className="spotify-queue">
-              <input
-                type="text"
-                placeholder="Search for a song..."
-                value={searchQuery}
-                onChange={handleSearchInputChange}
-              />
-
-            {suggestions.length > 0 && (
-              <div className="suggestions">
-                <ul>
-                  {suggestions.map((track) => (
-                    <li key={track.id} onClick={() => handleSuggestionClick(track)} className="suggestion-item">
-                      <img 
-                        src={track.album?.images[0]?.url || 'https://placeholder.com/150'} // Display album image
-                        alt={track.name}
-                        className="suggestion-image"
-                      />
-                      <div className="suggestion-text">
-                        <span className="track-name">{track.name}</span>
-                        <span className="artist-name">{track.artists.map((artist) => artist.name).join(', ')}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              )
-            }
-          </div>
           <div>
           <h1>Ongoing Queue</h1>
           </div>
